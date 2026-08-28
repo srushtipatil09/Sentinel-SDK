@@ -185,10 +185,10 @@ export const SdkOnboardingStep = () => {
 
   const currentDisplayKey = revealedKey || generatedKey;
 
-  const nodeCodeExample = `const { ObserveAIClient } = require("./sdk/observeai-sdk");
+  const nodeCodeExample = `const { SentinelAIClient } = require("./sdk/sentinelai-sdk");
 
-const sdk = new ObserveAIClient({
-    apiKey: "${currentDisplayKey || (activeApiKey ? activeApiKey.prefix + '...' : 'YOUR_OBSERVEAI_API_KEY')}",
+const sdk = new SentinelAIClient({
+    apiKey: "${currentDisplayKey || (activeApiKey ? activeApiKey.prefix + '...' : 'YOUR_SENTINELAI_API_KEY')}",
     serviceName: "${activeProject?.name?.toLowerCase().replace(/\s+/g, '-') || 'my-service'}",
     endpointUrl: "http://127.0.0.1:8000/api/v1/sdk/ingest"
 });
@@ -196,10 +196,10 @@ const sdk = new ObserveAIClient({
 // Capture HTTP request telemetry, errors, and traces
 app.use(sdk.expressMiddleware());`;
 
-  const pythonCodeExample = `from backend.sdk.client import ObserveAISDKClient
+  const pythonCodeExample = `from backend.sdk.client import SentinelAISDKClient
 
-sdk = ObserveAISDKClient(
-    api_key="${currentDisplayKey || (activeApiKey ? activeApiKey.prefix + '...' : 'YOUR_OBSERVEAI_API_KEY')}",
+sdk = SentinelAISDKClient(
+    api_key="${currentDisplayKey || (activeApiKey ? activeApiKey.prefix + '...' : 'YOUR_SENTINELAI_API_KEY')}",
     service_name="${activeProject?.name?.toLowerCase().replace(/\s+/g, '-') || 'my-service'}",
     endpoint_url="http://127.0.0.1:8000/api/v1/sdk/ingest"
 )
@@ -224,7 +224,7 @@ sdk.capture_log("ERROR", "Database connection pool timeout", attributes={"pool_s
           Connect Your Application via SDK
         </h3>
         <p className="text-sm text-slate-600 dark:text-slate-400">
-          Connect your microservices to ObserveAI to automatically ingest logs, uncaught exceptions, trace spans, and metric anomalies for AI Root Cause Analysis.
+          Connect your microservices to Sentinel AI to automatically ingest logs, uncaught exceptions, trace spans, and metric anomalies for AI Root Cause Analysis.
         </p>
 
         {/* Tech Selector */}
@@ -444,7 +444,7 @@ sdk.capture_log("ERROR", "Database connection pool timeout", attributes={"pool_s
         }}
         onConfirm={handleConfirmRevokeApiKey}
         title="Revoke SDK ingestion key?"
-        description="This will immediately stop this key from sending telemetry to ObserveAI. The key will be permanently deleted and cannot be recovered."
+        description="This will immediately stop this key from sending telemetry to Sentinel AI. The key will be permanently deleted and cannot be recovered."
         keyPrefix={keyToRevoke ? keyToRevoke.prefix : ''}
         confirmText="Revoke Key"
         cancelText="Cancel"

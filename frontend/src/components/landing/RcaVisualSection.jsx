@@ -25,7 +25,7 @@ export const RcaVisualSection = () => {
             Comprehensive Root Cause Reports
           </h2>
           <p className="text-base text-slate-400">
-            Here is what an AI-generated Root Cause Analysis report looks like when ObserveAI automatically investigates a production failure.
+            Here is what an AI-generated Root Cause Analysis report looks like when Sentinel AI automatically investigates a production failure.
           </p>
         </div>
 

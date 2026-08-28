@@ -1,3 +1,4 @@
-from backend.queue.rabbitmq_client import RabbitMQManager, rabbitmq_manager
+from backend.queue.pubsub_client import PubSubManager, pubsub_manager
+from backend.queue.event_bus import EventBus, event_bus
 
-__all__ = ["RabbitMQManager", "rabbitmq_manager"]
+__all__ = ["PubSubManager", "pubsub_manager", "EventBus", "event_bus"]

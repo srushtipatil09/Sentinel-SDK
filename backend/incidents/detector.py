@@ -12,6 +12,7 @@ from backend.models.incidents import Incident, IncidentTimeline, RcaReport
 from backend.models.projects import Service
 from backend.repositories.incident_repository import IncidentRepository, RcaReportRepository
 from backend.repositories.project_repository import ServiceRepository
+from backend.database.firestore_client import firestore_manager
 from backend.utils.logging import logger
 
 
@@ -259,6 +260,19 @@ class IncidentDetector:
         await session.flush()
         logger.info("Created new autonomous incident", incident_id=str(new_incident.id), severity=severity)
 
+        # ── Firestore: mirror new incident (best-effort) ────────────
+        try:
+            firestore_manager.upsert_incident(str(new_incident.id), {
+                "project_id": str(project_id),
+                "service_name": service_name,
+                "severity": severity,
+                "status": "CREATED",
+                "fingerprint": fingerprint,
+                "started_at": new_incident.started_at.isoformat() if new_incident.started_at else None,
+            })
+        except Exception as fs_exc:
+            logger.warning("Firestore incident mirror failed on create", error=str(fs_exc))
+
         # Trigger Autonomous LangGraph AI RCA Orchestration Workflow
                 # Trigger Autonomous LangGraph AI RCA Orchestration Workflow.
         # Fired as a background task (not awaited) so the ingest endpoint can
@@ -333,6 +347,12 @@ class IncidentDetector:
             incident.status = "AI_PROCESSING"
             await session.flush()
 
+            # ── Firestore: mirror AI_PROCESSING status (best-effort) ──
+            try:
+                firestore_manager.update_incident_status(str(incident.id), "AI_PROCESSING")
+            except Exception as fs_exc:
+                logger.warning("Firestore mirror failed for AI_PROCESSING", error=str(fs_exc))
+
             from backend.repositories.project_repository import ProjectRepository
             project_repo = ProjectRepository(session)
             project = await project_repo.get_by_id(incident.project_id)
@@ -394,6 +414,15 @@ class IncidentDetector:
                 incident.status = "INVESTIGATING"
                 incident.root_cause_summary = report_model.root_cause
                 incident.confidence_score = report_model.confidence_score
+
+                # ── Firestore: mirror INVESTIGATING + RCA results (best-effort) ──
+                try:
+                    firestore_manager.update_incident_status(str(incident.id), "INVESTIGATING", {
+                        "root_cause_summary": report_model.root_cause,
+                        "confidence_score": report_model.confidence_score,
+                    })
+                except Exception as fs_exc:
+                    logger.warning("Firestore mirror failed for INVESTIGATING", error=str(fs_exc))
 
                 # Add Timeline record for AI RCA completion
                 ai_timeline = IncidentTimeline(

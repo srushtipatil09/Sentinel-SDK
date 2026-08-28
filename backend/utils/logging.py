@@ -36,4 +36,4 @@ def setup_logging() -> None:
     )
 
 
-logger = structlog.get_logger("observeai")
+logger = structlog.get_logger("sentinelai")

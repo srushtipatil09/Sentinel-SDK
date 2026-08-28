@@ -32,7 +32,7 @@ class GeminiClient:
             return self._generate_fallback_rca(incident_context, confidence_meta)
 
         prompt = f"""
-You are the Lead Autonomous AI Systems Architect and Root Cause Analysis (RCA) Engine for ObserveAI.
+You are the Lead Autonomous AI Systems Architect and Root Cause Analysis (RCA) Engine for Sentinel AI.
 Synthesize the structured domain-specific findings produced by the autonomous multi-agent pipeline and historical knowledge to determine the precise root cause, timeline, evidence, and actionable remedies.
 
 ### INCIDENT CONTEXT

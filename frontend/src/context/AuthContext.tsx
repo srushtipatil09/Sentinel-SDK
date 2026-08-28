@@ -19,7 +19,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const fetchUser = async () => {
-    const token = localStorage.getItem('observeai_access_token');
+    const token = localStorage.getItem('sentinelai_access_token');
     if (!token) {
       setUser(null);
       setIsLoading(false);
@@ -31,8 +31,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(userData);
     } catch (err) {
       console.error('Failed to validate stored access token:', err);
-      localStorage.removeItem('observeai_access_token');
-      localStorage.removeItem('observeai_refresh_token');
+      localStorage.removeItem('sentinelai_access_token');
+      localStorage.removeItem('sentinelai_refresh_token');
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -47,8 +47,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     try {
       const tokenResp = await authApi.login(credentials);
-      localStorage.setItem('observeai_access_token', tokenResp.access_token);
-      localStorage.setItem('observeai_refresh_token', tokenResp.refresh_token);
+      localStorage.setItem('sentinelai_access_token', tokenResp.access_token);
+      localStorage.setItem('sentinelai_refresh_token', tokenResp.refresh_token);
       const userData = await authApi.getMe();
       setUser(userData);
     } finally {
@@ -68,9 +68,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
-    localStorage.removeItem('observeai_access_token');
-    localStorage.removeItem('observeai_refresh_token');
-    localStorage.removeItem('observeai_active_project_id');
+    localStorage.removeItem('sentinelai_access_token');
+    localStorage.removeItem('sentinelai_refresh_token');
+    localStorage.removeItem('sentinelai_active_project_id');
     setUser(null);
     window.location.href = '/login';
   };

@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     )
 
     # Core App Settings
-    APP_NAME: str = "ObserveAI Platform"
+    APP_NAME: str = "Sentinel AI Platform"
     APP_ENV: str = Field(default="development", description="development | staging | production")
     DEBUG: bool = False
     API_V1_STR: str = "/api/v1"
@@ -32,12 +32,12 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3001",
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-        "https://app.observeai.io"
+        "https://app.sentinelai.io"
     ]
 
     # Supabase PostgreSQL Cloud Database Settings
     DATABASE_URL: str = Field(
-        default="postgresql+asyncpg://postgres:postgres@localhost:5432/observeai_db",
+        default="postgresql+asyncpg://postgres:postgres@localhost:5432/sentinelai_db",
         description="Supabase PostgreSQL Cloud connection string (postgresql+asyncpg://...)"
     )
     DB_POOL_SIZE: int = 20
@@ -86,7 +86,7 @@ class Settings(BaseSettings):
     CHROMADB_PORT: int = 8000
     CHROMADB_PATH: str = "./data/chromadb"
     CHROMADB_PERSIST_DIRECTORY: str = "./data/chromadb"
-    CHROMADB_COLLECTION_PREFIX: str = "observeai"
+    CHROMADB_COLLECTION_PREFIX: str = "sentinelai"
     CHROMADB_IS_REMOTE: bool = False
 
     # Cache Settings (Redis)
@@ -103,33 +103,44 @@ class Settings(BaseSettings):
             return f"redis://:{self.REDIS_PASSWORD}@{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
         return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
 
-    # Message Queue Settings (RabbitMQ)
-    RABBITMQ_HOST: str = "localhost"
-    RABBITMQ_PORT: int = 5672
-    RABBITMQ_USER: str = "guest"
-    RABBITMQ_PASSWORD: str = "guest"
-    RABBITMQ_VHOST: str = "/"
-    RABBITMQ_TELEMETRY_EXCHANGE: str = "telemetry.exchange"
-    RABBITMQ_TELEMETRY_QUEUE: str = "telemetry.raw.queue"
-    RABBITMQ_INCIDENT_QUEUE: str = "incidents.queue"
-    RABBITMQ_AI_RCA_QUEUE: str = "ai.rca.queue"
-    RABBITMQ_EMBEDDING_QUEUE: str = "embeddings.queue"
-    RABBITMQ_NOTIFICATION_QUEUE: str = "notifications.queue"
-    RABBITMQ_DLX_EXCHANGE: str = "dlx.exchange"
-    RABBITMQ_DLQ: str = "dead_letter.queue"
-
-    @property
-    def rabbitmq_url(self) -> str:
-        return f"amqp://{self.RABBITMQ_USER}:{self.RABBITMQ_PASSWORD}@{self.RABBITMQ_HOST}:{self.RABBITMQ_PORT}/{self.RABBITMQ_VHOST.lstrip('/')}"
-
     # AI & LLM Settings
     GEMINI_API_KEY: str = Field(default="", description="Google Gemini API Key")
     GEMINI_MODEL: str = "gemini-2.5-flash"
     GEMINI_TEMPERATURE: float = 0.2
     GEMINI_MAX_TOKENS: int = 4096
 
-    # Embeddings & RAG Settings
-    EMBEDDING_MODEL_NAME: str = "all-MiniLM-L6-v2"
+    # ── Google Cloud Platform Settings ──────────────────────────────────
+    GCP_PROJECT_ID: str = Field(default="", description="Google Cloud project ID")
+    GCP_LOCATION: str = Field(default="us-central1", description="Google Cloud region")
+    GOOGLE_APPLICATION_CREDENTIALS: Optional[str] = Field(
+        default=None, description="Path to GCP service-account JSON key file"
+    )
+
+    # BigQuery (telemetry warehouse + BigQuery ML anomaly detection)
+    BIGQUERY_ENABLED: bool = Field(default=True, description="BigQuery telemetry warehouse (primary)")
+    BIGQUERY_DATASET: str = Field(default="sentinelai", description="BigQuery dataset name")
+    BIGQUERY_TELEMETRY_TABLE: str = Field(default="telemetry_events", description="BigQuery telemetry table")
+    BIGQUERY_ANOMALY_MODEL: str = Field(default="error_rate_arima", description="BigQuery ML ARIMA+ model name")
+
+    # Pub/Sub (primary async event bus)
+    PUBSUB_ENABLED: bool = Field(default=True, description="Google Pub/Sub event bus (primary)")
+    PUBSUB_TELEMETRY_TOPIC: str = Field(default="telemetry-events", description="Pub/Sub telemetry topic")
+    PUBSUB_INCIDENT_TOPIC: str = Field(default="incident-events", description="Pub/Sub incident topic")
+    PUBSUB_RCA_TOPIC: str = Field(default="ai-rca-events", description="Pub/Sub RCA topic")
+
+    # Firestore (live incident-state store)
+    FIRESTORE_ENABLED: bool = Field(default=True, description="Firestore live incident state (primary)")
+    FIRESTORE_INCIDENTS_COLLECTION: str = Field(
+        default="incidents_live", description="Firestore collection for live incident state"
+    )
+
+    # Vertex AI (managed embeddings — primary)
+    VERTEX_AI_ENABLED: bool = Field(default=True, description="Vertex AI managed embeddings (primary)")
+    VERTEX_EMBEDDING_MODEL: str = Field(
+        default="text-embedding-004", description="Vertex AI embedding model name"
+    )
+
+    # RAG Settings
     RAG_TOP_K: int = 5
     RAG_SIMILARITY_THRESHOLD: float = 0.65
     CHUNK_SIZE: int = 1000
@@ -151,8 +162,8 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USER: Optional[str] = None
     SMTP_PASSWORD: Optional[str] = None
-    EMAILS_FROM_EMAIL: str = "alerts@observeai.io"
-    EMAILS_FROM_NAME: str = "ObserveAI Alerts"
+    EMAILS_FROM_EMAIL: str = "alerts@sentinelai.io"
+    EMAILS_FROM_NAME: str = "Sentinel AI Alerts"
 
     # Observability
     PROMETHEUS_ENABLED: bool = True

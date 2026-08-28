@@ -11,10 +11,10 @@ export const DifferentiationSection = () => {
             <span>Architectural Differentiation</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-100 tracking-tight">
-            Why ObserveAI?
+            Why Sentinel AI?
           </h2>
           <p className="text-base text-slate-400">
-            ObserveAI is designed to reduce the investigation work between an incident and an actionable explanation.
+            Sentinel AI is designed to reduce the investigation work between an incident and an actionable explanation.
           </p>
         </div>
 
@@ -56,7 +56,7 @@ export const DifferentiationSection = () => {
             </p>
           </div>
 
-          {/* ObserveAI Paradigm */}
+          {/* Sentinel AI Paradigm */}
           <div className="p-8 rounded-3xl bg-[#172033] border border-blue-500/40 shadow-2xl space-y-6 flex flex-col justify-between">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -64,7 +64,7 @@ export const DifferentiationSection = () => {
                   <Zap className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-slate-100">ObserveAI Autonomous Engine</h3>
+                  <h3 className="text-xl font-bold text-slate-100">Sentinel AI Autonomous Engine</h3>
                   <p className="text-xs text-cyan-400 font-medium">Telemetry to actionable intelligence pipeline</p>
                 </div>
               </div>
@@ -98,7 +98,7 @@ export const DifferentiationSection = () => {
             </div>
 
             <p className="text-xs text-slate-300 leading-relaxed font-medium">
-              ObserveAI active agents automate telemetry correlation, query historical runbooks, and produce an actionable RCA report complete with confidence ratings and recommended resolution steps.
+              Sentinel AI active agents automate telemetry correlation, query historical runbooks, and produce an actionable RCA report complete with confidence ratings and recommended resolution steps.
             </p>
           </div>
         </div>

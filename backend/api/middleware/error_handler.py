@@ -1,14 +1,14 @@
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from backend.schemas.common import StandardErrorResponse
-from backend.utils.exceptions import ObserveAIException
+from backend.utils.exceptions import SentinelAIException
 from backend.utils.logging import logger
 
 
-async def observeai_exception_handler(request: Request, exc: ObserveAIException) -> JSONResponse:
-    """Global exception handler converting ObserveAIException to standard JSON error format."""
+async def sentinelai_exception_handler(request: Request, exc: SentinelAIException) -> JSONResponse:
+    """Global exception handler converting SentinelAIException to standard JSON error format."""
     logger.warning(
-        "ObserveAI platform exception",
+        "Sentinel AI platform exception",
         path=request.url.path,
         error_code=exc.error_code,
         message=exc.message

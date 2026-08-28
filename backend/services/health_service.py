@@ -32,14 +32,15 @@ class HealthService:
         except Exception as exc:
             health_status["components"]["redis"] = {"status": "degraded", "error": str(exc)}
 
-        # 3. RabbitMQ Check
+        # 3. Pub/Sub Check
         try:
-            import aio_pika
-            conn = await aio_pika.connect_robust(settings.rabbitmq_url, timeout=2)
-            await conn.close()
-            health_status["components"]["rabbitmq"] = {"status": "up"}
+            from backend.queue.pubsub_client import pubsub_manager
+            if pubsub_manager.enabled:
+                health_status["components"]["pubsub"] = {"status": "up"}
+            else:
+                health_status["components"]["pubsub"] = {"status": "degraded", "error": "Pub/Sub not enabled or init failed"}
         except Exception as exc:
-            health_status["components"]["rabbitmq"] = {"status": "degraded", "error": str(exc)}
+            health_status["components"]["pubsub"] = {"status": "degraded", "error": str(exc)}
 
         # 4. ChromaDB Check
         try:

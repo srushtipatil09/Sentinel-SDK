@@ -129,7 +129,7 @@ export const Incidents = () => {
       ) : (
         <EmptyState
           title="Your systems are healthy."
-          description="Once ObserveAI detects an operational anomaly or latency spike, autonomous incidents will appear here."
+          description="Once Sentinel AI detects an operational anomaly or latency spike, autonomous incidents will appear here."
           icon={ShieldCheck}
         />
       )}

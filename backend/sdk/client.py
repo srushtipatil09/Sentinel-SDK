@@ -3,10 +3,10 @@ import httpx
 from backend.utils.logging import logger
 
 
-class ObserveAISDKClient:
+class SentinelAISDKClient:
     """
     Reference Python SDK Client implementation demonstrating auto-buffering,
-    compression, retry logic, and batch upload to the ObserveAI backend ingestion API.
+    compression, retry logic, and batch upload to the Sentinel AI backend ingestion API.
     """
 
     def __init__(

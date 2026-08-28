@@ -38,7 +38,7 @@ def test_phase3_multi_agent_workflow_reasoning():
             {
                 "version": "v2.4.1",
                 "commit_hash": "a1b2c3d4e5f",
-                "author": "devops@observeai.io",
+                "author": "devops@sentinelai.io",
                 "commit_message": "Migrate DB pool settings to min_size=50",
                 "deployed_at": "2026-08-06T11:45:00Z"
             }

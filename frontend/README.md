@@ -1,6 +1,6 @@
-# ObserveAI Frontend Application
+# Sentinel AI Frontend Application
 
-ObserveAI is an AI-powered observability and autonomous Root Cause Analysis (RCA) platform. This frontend application communicates directly with the FastAPI backend (`http://127.0.0.1:8000/api/v1`) through standardized HTTP JSON API envelopes.
+Sentinel AI is an AI-powered observability and autonomous Root Cause Analysis (RCA) platform. This frontend application communicates directly with the FastAPI backend (`http://127.0.0.1:8000/api/v1`) through standardized HTTP JSON API envelopes.
 
 ---
 
@@ -22,7 +22,7 @@ ObserveAI is an AI-powered observability and autonomous Root Cause Analysis (RCA
 ### Prerequisites
 
 - Node.js (v18.0.0 or higher)
-- ObserveAI FastAPI Backend running on `http://127.0.0.1:8000`
+- Sentinel AI FastAPI Backend running on `http://127.0.0.1:8000`
 
 ### Installation
 
@@ -80,7 +80,7 @@ frontend/
 
 ## 🔒 Security & Key Handling
 
-- **USER JWT TOKEN**: Saved in `localStorage` under `observeai_access_token` and auto-attached as `Authorization: Bearer <access_token>` to protected API requests.
+- **USER JWT TOKEN**: Saved in `localStorage` under `sentinelai_access_token` and auto-attached as `Authorization: Bearer <access_token>` to protected API requests.
 - **SDK API KEYS**: Generated via **Settings > SDK Integration** or Project API keys. The raw key is returned and displayed **ONCE** upon generation for customer application setup.
 
 ---
@@ -91,5 +91,5 @@ frontend/
 2. Start Frontend (`npm run dev` on port 3000).
 3. Open `http://localhost:3000/register` to create an organization account.
 4. Select/Create a Project and generate an SDK Ingestion API Key.
-5. Ingest telemetry from `observeai-test-app` or post to `http://127.0.0.1:8000/api/v1/sdk/ingest`.
+5. Ingest telemetry from `sentinelai-test-app` or post to `http://127.0.0.1:8000/api/v1/sdk/ingest`.
 6. Open **Incidents** -> Select Incident -> View multi-agent AI RCA pipeline execution, evidence cards, confidence breakdown, and recommended fixes.

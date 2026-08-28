@@ -5,27 +5,30 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: observeai_backend
+    container_name: sentinelai_backend
     ports:
-      - "8000:8000"
+      - "8080:8080"
     environment:
       - APP_ENV=production
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_HOST=redis
-      - RABBITMQ_HOST=rabbitmq
       - CHROMADB_HOST=chromadb
       - CHROMADB_IS_REMOTE=true
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID}
+      - GCP_LOCATION=${GCP_LOCATION}
+      - BIGQUERY_ENABLED=true
+      - PUBSUB_ENABLED=true
+      - FIRESTORE_ENABLED=true
+      - VERTEX_AI_ENABLED=true
     depends_on:
       redis:
-        condition: service_healthy
-      rabbitmq:
         condition: service_healthy
     restart: always
 
   redis:
     image: redis:7-alpine
-    container_name: observeai_redis
+    container_name: sentinelai_redis
     ports:
       - "6379:6379"
     volumes:
@@ -37,27 +40,9 @@ services:
       retries: 5
     restart: always
 
-  rabbitmq:
-    image: rabbitmq:3.12-management-alpine
-    container_name: observeai_rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: always
-
   chromadb:
     image: chromadb/chroma:latest
-    container_name: observeai_chromadb
+    container_name: sentinelai_chromadb
     ports:
       - "8001:8000"
     volumes:
@@ -66,5 +51,4 @@ services:
 
 volumes:
   redis_data:
-  rabbitmq_data:
   chroma_data:

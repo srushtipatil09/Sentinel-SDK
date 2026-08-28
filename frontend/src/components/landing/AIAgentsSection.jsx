@@ -115,7 +115,7 @@ export const AIAgentsSection = () => {
             One Incident. Multiple Specialized Investigators.
           </h2>
           <p className="text-base text-slate-400">
-            ObserveAI doesn&apos;t rely on a single generic AI prompt. Instead, a swarm of domain-specific AI agents collaborate to investigate every angle of production failures.
+            Sentinel AI doesn&apos;t rely on a single generic AI prompt. Instead, a swarm of domain-specific AI agents collaborate to investigate every angle of production failures.
           </p>
         </div>
 

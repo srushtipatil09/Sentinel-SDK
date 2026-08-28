@@ -1,0 +1,53 @@
+# Cloud Build — build, push, and deploy Sentinel AI to Cloud Run
+# Usage:
+#   gcloud builds submit --config cloudbuild.yaml \
+#     --substitutions=_REGION=us-central1,_SERVICE_NAME=sentinelai-backend
+
+substitutions:
+  _REGION: us-central1
+  _SERVICE_NAME: sentinelai-backend
+  _IMAGE: gcr.io/${PROJECT_ID}/${_SERVICE_NAME}
+
+steps:
+  # 1. Build container image
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-t"
+      - "${_IMAGE}:${SHORT_SHA}"
+      - "-t"
+      - "${_IMAGE}:latest"
+      - "."
+
+  # 2. Push to Artifact Registry / GCR
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "--all-tags", "${_IMAGE}"]
+
+  # 3. Deploy to Cloud Run
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - "run"
+      - "deploy"
+      - "${_SERVICE_NAME}"
+      - "--image=${_IMAGE}:${SHORT_SHA}"
+      - "--region=${_REGION}"
+      - "--platform=managed"
+      - "--allow-unauthenticated"
+      - "--port=8080"
+      - "--memory=1Gi"
+      - "--cpu=2"
+      - "--min-instances=0"
+      - "--max-instances=10"
+      - "--add-cloudsql-instances=${PROJECT_ID}:${_REGION}:sentinel-db"
+      - "--set-env-vars"
+      - "APP_ENV=production,GCP_PROJECT_ID=${PROJECT_ID},GCP_LOCATION=${_REGION},BIGQUERY_ENABLED=true,PUBSUB_ENABLED=true,FIRESTORE_ENABLED=true,VERTEX_AI_ENABLED=true"
+      - "--set-secrets"
+      - "GEMINI_API_KEY=GEMINI_API_KEY:latest,DATABASE_URL=DATABASE_URL:latest,SECRET_KEY=SECRET_KEY:latest"
+
+images:
+  - "${_IMAGE}:${SHORT_SHA}"
+  - "${_IMAGE}:latest"
+
+options:
+  logging: CLOUD_LOGGING_ONLY

@@ -23,9 +23,9 @@ COPY tests/ ./tests
 # Environment settings
 ENV PYTHONPATH=/app
 ENV HOST=0.0.0.0
-ENV PORT=8000
+ENV PORT=8080
 
-EXPOSE 8000
+EXPOSE 8080
 
-# Start production server
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+# Cloud Run injects $PORT at runtime; honour it with a sensible default.
+CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8080}"]

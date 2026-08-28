@@ -16,7 +16,7 @@ export const HowItWorksSection = () => {
     {
       num: '01',
       title: 'Connect SDK',
-      desc: 'Developer integrates the lightweight ObserveAI SDK into their Node.js or Python application in under 2 minutes.',
+      desc: 'Developer integrates the lightweight Sentinel AI SDK into their Node.js or Python application in under 2 minutes.',
       icon: Code,
       color: 'text-blue-400',
       bg: 'bg-blue-500/10',
@@ -34,7 +34,7 @@ export const HowItWorksSection = () => {
     {
       num: '03',
       title: 'Detect Anomalies',
-      desc: 'ObserveAI evaluates incoming telemetry and automatically triggers incidents on error spikes, uncaught exceptions, or latency breaches.',
+      desc: 'Sentinel AI evaluates incoming telemetry and automatically triggers incidents on error spikes, uncaught exceptions, or latency breaches.',
       icon: ShieldAlert,
       color: 'text-amber-400',
       bg: 'bg-amber-500/10',
@@ -96,7 +96,7 @@ export const HowItWorksSection = () => {
             <span>Step-By-Step Architecture</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-100 tracking-tight">
-            How ObserveAI Works
+            How Sentinel AI Works
           </h2>
           <p className="text-base text-slate-400">
             From SDK telemetry streaming to vector-indexed historical intelligence, observe how autonomous AI agents correlate production signals.

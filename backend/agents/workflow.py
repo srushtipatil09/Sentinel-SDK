@@ -700,18 +700,14 @@ class LangGraphRCAWorkflow:
             logger.error("Failed to auto-embed RCA report into ChromaDB", error=str(exc))
 
     def run_workflow(self, initial_state: RCAAgentState) -> RCAAgentState:
-        """Executes full autonomous multi-agent sequence."""
-        state = initial_state
-        state = self.planner_node(state)
-        state = self.log_analysis_node(state)
-        state = self.trace_analysis_node(state)
-        state = self.exception_analysis_node(state)
-        state = self.metrics_node(state)
-        state = self.git_deployment_node(state)
-        state = self.rag_retrieval_node(state)
-        state = self.confidence_node(state)
-        state = self.final_rca_node(state)
-        return state
+        """Executes full autonomous multi-agent RCA workflow via compiled LangGraph StateGraph."""
+        from backend.agents.graph import compiled_rca_graph
+
+        logger.info("Invoking RCA workflow via compiled LangGraph StateGraph")
+        result = compiled_rca_graph.invoke(initial_state.model_dump())
+        if isinstance(result, dict):
+            return RCAAgentState(**result)
+        return result
 
 
 rca_workflow = LangGraphRCAWorkflow()

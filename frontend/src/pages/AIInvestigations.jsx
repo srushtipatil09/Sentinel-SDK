@@ -94,7 +94,7 @@ export const AIInvestigations = () => {
       ) : (
         <EmptyState
           title="No AI investigations yet."
-          description="Investigate your first incident to see ObserveAI's autonomous RCA engine in action."
+          description="Investigate your first incident to see Sentinel AI's autonomous RCA engine in action."
           icon={Bot}
         />
       )}
