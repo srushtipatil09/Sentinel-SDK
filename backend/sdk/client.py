@@ -13,7 +13,7 @@ class SentinelAISDKClient:
         self,
         api_key: str,
         service_name: str,
-        endpoint_url: str = "http://localhost:8000/api/v1/sdk/ingest",
+        endpoint_url: str = "https://sentinelai-backend-w23eki576a-uc.a.run.app/api/v1/sdk/ingest",
         environment: str = "production",
         max_batch_size: int = 100
     ):
