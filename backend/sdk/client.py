@@ -48,6 +48,58 @@ class SentinelAISDKClient:
         })
         self._flush_if_needed()
 
+    def capture_trace(
+        self,
+        trace_id: str,
+        span_id: str,
+        operation_name: str,
+        duration_ms: float,
+        status_code: int = 200,
+        attributes: Optional[Dict[str, Any]] = None
+    ) -> None:
+        self._buffer["traces"].append({
+            "trace_id": trace_id,
+            "span_id": span_id,
+            "operation_name": operation_name,
+            "duration_ms": duration_ms,
+            "status_code": status_code,
+            "attributes": attributes or {}
+        })
+        self._flush_if_needed()
+
+    def capture_metric(
+        self,
+        name: str,
+        value: float,
+        metric_type: str = "gauge",
+        unit: Optional[str] = None,
+        tags: Optional[Dict[str, Any]] = None
+    ) -> None:
+        self._buffer["metrics"].append({
+            "name": name,
+            "value": value,
+            "metric_type": metric_type,
+            "unit": unit,
+            "tags": tags or {}
+        })
+        self._flush_if_needed()
+
+    def capture_deployment(
+        self,
+        version: str,
+        commit_hash: Optional[str] = None,
+        commit_message: Optional[str] = None,
+        author: Optional[str] = None
+    ) -> None:
+        self._buffer["deployments"].append({
+            "version": version,
+            "commit_hash": commit_hash,
+            "commit_message": commit_message,
+            "author": author,
+            "status": "deployed"
+        })
+        self._flush_if_needed()
+
     def _flush_if_needed(self) -> None:
         total_items = sum(len(v) for v in self._buffer.values())
         if total_items >= self.max_batch_size:
