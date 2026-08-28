@@ -6,7 +6,6 @@
 substitutions:
   _REGION: us-central1
   _SERVICE_NAME: sentinelai-backend
-  _IMAGE: gcr.io/${PROJECT_ID}/${_SERVICE_NAME}
 
 steps:
   # 1. Build container image
@@ -14,14 +13,17 @@ steps:
     args:
       - "build"
       - "-t"
-      - "${_IMAGE}:${SHORT_SHA}"
+      - "gcr.io/$PROJECT_ID/$_SERVICE_NAME:$BUILD_ID"
       - "-t"
-      - "${_IMAGE}:latest"
+      - "gcr.io/$PROJECT_ID/$_SERVICE_NAME:latest"
       - "."
 
-  # 2. Push to Artifact Registry / GCR
+  # 2. Push to Container Registry
   - name: "gcr.io/cloud-builders/docker"
-    args: ["push", "--all-tags", "${_IMAGE}"]
+    args:
+      - "push"
+      - "--all-tags"
+      - "gcr.io/$PROJECT_ID/$_SERVICE_NAME"
 
   # 3. Deploy to Cloud Run
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
@@ -29,9 +31,9 @@ steps:
     args:
       - "run"
       - "deploy"
-      - "${_SERVICE_NAME}"
-      - "--image=${_IMAGE}:${SHORT_SHA}"
-      - "--region=${_REGION}"
+      - "$_SERVICE_NAME"
+      - "--image=gcr.io/$PROJECT_ID/$_SERVICE_NAME:latest"
+      - "--region=$_REGION"
       - "--platform=managed"
       - "--allow-unauthenticated"
       - "--port=8080"
@@ -39,15 +41,14 @@ steps:
       - "--cpu=2"
       - "--min-instances=0"
       - "--max-instances=10"
-      - "--add-cloudsql-instances=${PROJECT_ID}:${_REGION}:sentinel-db"
       - "--set-env-vars"
-      - "APP_ENV=production,GCP_PROJECT_ID=${PROJECT_ID},GCP_LOCATION=${_REGION},BIGQUERY_ENABLED=true,PUBSUB_ENABLED=true,FIRESTORE_ENABLED=true,VERTEX_AI_ENABLED=true"
+      - "APP_ENV=production,GCP_PROJECT_ID=$PROJECT_ID,GCP_LOCATION=$_REGION,BIGQUERY_ENABLED=true,PUBSUB_ENABLED=true,FIRESTORE_ENABLED=true,VERTEX_AI_ENABLED=true"
       - "--set-secrets"
       - "GEMINI_API_KEY=GEMINI_API_KEY:latest,DATABASE_URL=DATABASE_URL:latest,SECRET_KEY=SECRET_KEY:latest"
 
 images:
-  - "${_IMAGE}:${SHORT_SHA}"
-  - "${_IMAGE}:latest"
+  - "gcr.io/$PROJECT_ID/$_SERVICE_NAME:$BUILD_ID"
+  - "gcr.io/$PROJECT_ID/$_SERVICE_NAME:latest"
 
 options:
   logging: CLOUD_LOGGING_ONLY
