@@ -185,12 +185,14 @@ export const SdkOnboardingStep = () => {
 
   const currentDisplayKey = revealedKey || generatedKey;
 
-  const nodeCodeExample = `const { SentinelAIClient } = require("./sdk/sentinelai-sdk");
+  const backendIngestUrl = (import.meta.env.VITE_API_BASE_URL || 'https://sentinelai-backend-w23eki576a-uc.a.run.app/api/v1') + '/sdk/ingest';
+
+  const nodeCodeExample = `import { SentinelAIClient } from '@sentinelai/sdk';
 
 const sdk = new SentinelAIClient({
     apiKey: "${currentDisplayKey || (activeApiKey ? activeApiKey.prefix + '...' : 'YOUR_SENTINELAI_API_KEY')}",
     serviceName: "${activeProject?.name?.toLowerCase().replace(/\s+/g, '-') || 'my-service'}",
-    endpointUrl: "http://127.0.0.1:8000/api/v1/sdk/ingest"
+    endpointUrl: "${backendIngestUrl}"
 });
 
 // Capture HTTP request telemetry, errors, and traces
@@ -201,7 +203,7 @@ app.use(sdk.expressMiddleware());`;
 sdk = SentinelAISDKClient(
     api_key="${currentDisplayKey || (activeApiKey ? activeApiKey.prefix + '...' : 'YOUR_SENTINELAI_API_KEY')}",
     service_name="${activeProject?.name?.toLowerCase().replace(/\s+/g, '-') || 'my-service'}",
-    endpoint_url="http://127.0.0.1:8000/api/v1/sdk/ingest"
+    endpoint_url="${backendIngestUrl}"
 )
 
 # Capture log signal
