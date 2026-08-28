@@ -198,7 +198,8 @@ const sdk = new SentinelAIClient({
 // Capture HTTP request telemetry, errors, and traces
 app.use(sdk.expressMiddleware());`;
 
-  const pythonCodeExample = `from backend.sdk.client import SentinelAISDKClient
+  const pythonCodeExample = `# Installation: pip install sentinelai-telemetry-sdk
+from sentinelai_sdk import SentinelAISDKClient
 
 sdk = SentinelAISDKClient(
     api_key="${currentDisplayKey || (activeApiKey ? activeApiKey.prefix + '...' : 'YOUR_SENTINELAI_API_KEY')}",
