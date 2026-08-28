@@ -90,7 +90,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
             {!isCollapsed && (
               <span className="font-bold text-lg text-white tracking-tight">
-                Observe<span className="text-brand-400">AI</span>
+                Sentinel<span className="text-brand-400">AI</span>
               </span>
             )}
           </div>

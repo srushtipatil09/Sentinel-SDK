@@ -35,7 +35,7 @@ export const Login = () => {
             <Activity className="w-7 h-7 animate-pulse" />
           </div>
           <h1 className="text-2xl font-bold text-white tracking-tight">
-            Sign in to Observe<span className="text-brand-400">AI</span>
+            Sign in to Sentinel<span className="text-brand-400">AI</span>
           </h1>
           <p className="text-xs text-slate-400">
             Autonomous AI Observability & Root Cause Analysis Platform

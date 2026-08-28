@@ -24,7 +24,7 @@ export const Footer = () => {
                 <Activity className="w-5 h-5 text-white" />
               </div>
               <div className="flex items-center">
-                <span className="text-lg font-bold text-slate-100">Observe</span>
+                <span className="text-lg font-bold text-slate-100">Sentinel</span>
                 <span className="text-lg font-bold text-blue-400">AI</span>
               </div>
             </Link>

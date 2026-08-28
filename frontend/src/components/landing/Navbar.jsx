@@ -56,7 +56,7 @@ export const Navbar = () => {
               <Activity className="w-5 h-5 text-white animate-pulse" />
             </div>
             <div className="flex items-center">
-              <span className="text-xl font-bold text-slate-100 tracking-tight">Observe</span>
+              <span className="text-xl font-bold text-slate-100 tracking-tight">Sentinel</span>
               <span className="text-xl font-bold text-blue-400">AI</span>
             </div>
           </Link>
