@@ -16,9 +16,10 @@ COPY requirements.txt .
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend codebase
+# Copy backend codebase and configuration
 COPY backend/ ./backend
 COPY tests/ ./tests
+COPY alembic.ini .
 
 # Environment settings
 ENV PYTHONPATH=/app
