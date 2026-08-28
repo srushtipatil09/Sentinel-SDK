@@ -6,7 +6,7 @@ export const SdkSection = () => {
   const [copiedInstall, setCopiedInstall] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
 
-  const installCmd = 'npm install github:ShivangiP2005/observai-sdk';
+  const installCmd = 'npm install sentinelai-sdk';
 
   const nodeSnippet = `const { SentinelAIClient } = require('sentinelai-sdk');
 const client = new SentinelAIClient({ apiKey: 'stl_live_xxx', serviceName: 'checkout-service' });
