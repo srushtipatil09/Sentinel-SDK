@@ -139,7 +139,7 @@ export const Dashboard = () => {
   };
 
   if (isLoading) {
-    return <LoadingState label="Loading ObserveAI system health & active incidents..." type="skeleton" count={4} />;
+    return <LoadingState label="Loading Sentinel AI system health & active incidents..." type="skeleton" count={4} />;
   }
 
   const firstName = user?.full_name ? user.full_name.split(' ')[0] : 'Engineer';
@@ -361,8 +361,8 @@ export const Dashboard = () => {
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
                 {hasZeroProjects
-                  ? 'Create a project and connect the ObserveAI SDK to start monitoring telemetry and automated RCA.'
-                  : 'Active ObserveAI SDK telemetry will automatically trigger multi-agent RCA upon operational anomalies.'}
+                  ? 'Create a project and connect the Sentinel AI SDK to start monitoring telemetry and automated RCA.'
+                  : 'Active Sentinel AI SDK telemetry will automatically trigger multi-agent RCA upon operational anomalies.'}
               </p>
             </div>
             <button

@@ -1,10 +1,12 @@
 import uuid
 from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class RCAAgentState(BaseModel):
     """LangGraph Shared Graph State across all specialized agents."""
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     incident_id: str
     project_id: str

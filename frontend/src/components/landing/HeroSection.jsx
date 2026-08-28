@@ -124,7 +124,7 @@ export const HeroSection = () => {
 
           {/* Supporting Text */}
           <p className="text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto font-normal leading-relaxed">
-            ObserveAI monitors your application&apos;s telemetry, detects incidents, and uses autonomous AI agents to identify root causes and recommend fixes before your team has to dig through thousands of logs.
+            Sentinel AI monitors your application&apos;s telemetry, detects incidents, and uses autonomous AI agents to identify root causes and recommend fixes before your team has to dig through thousands of logs.
           </p>
 
           {/* CTA Buttons */}
@@ -162,7 +162,7 @@ export const HeroSection = () => {
                 <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
               </div>
               <span className="text-xs font-mono text-slate-400 hidden sm:inline-block">
-                observeai // autonomous-pipeline-active
+                sentinelai // autonomous-pipeline-active
               </span>
             </div>
             <div className="flex items-center gap-2">

@@ -2,8 +2,8 @@ from typing import Any, Dict, Optional
 from fastapi import status
 
 
-class ObserveAIException(Exception):
-    """Base exception class for all ObserveAI platform errors."""
+class SentinelAIException(Exception):
+    """Base exception class for all Sentinel AI platform errors."""
     def __init__(
         self,
         message: str,
@@ -18,7 +18,7 @@ class ObserveAIException(Exception):
         self.details = details or {}
 
 
-class NotFoundError(ObserveAIException):
+class NotFoundError(SentinelAIException):
     def __init__(self, resource_name: str, resource_id: Any):
         super().__init__(
             message=f"{resource_name} with identifier '{resource_id}' was not found.",
@@ -28,7 +28,7 @@ class NotFoundError(ObserveAIException):
         )
 
 
-class AuthenticationError(ObserveAIException):
+class AuthenticationError(SentinelAIException):
     def __init__(self, message: str = "Authentication failed or token invalid."):
         super().__init__(
             message=message,
@@ -37,7 +37,7 @@ class AuthenticationError(ObserveAIException):
         )
 
 
-class AuthorizationError(ObserveAIException):
+class AuthorizationError(SentinelAIException):
     def __init__(self, message: str = "Permission denied for requested resource."):
         super().__init__(
             message=message,
@@ -46,7 +46,7 @@ class AuthorizationError(ObserveAIException):
         )
 
 
-class RateLimitError(ObserveAIException):
+class RateLimitError(SentinelAIException):
     def __init__(self, retry_after_seconds: int = 60):
         super().__init__(
             message=f"Rate limit exceeded. Please retry after {retry_after_seconds} seconds.",
@@ -56,7 +56,7 @@ class RateLimitError(ObserveAIException):
         )
 
 
-class ValidationException(ObserveAIException):
+class ValidationException(SentinelAIException):
     def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
         super().__init__(
             message=message,
@@ -66,7 +66,7 @@ class ValidationException(ObserveAIException):
         )
 
 
-class IngestionError(ObserveAIException):
+class IngestionError(SentinelAIException):
     def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
         super().__init__(
             message=f"Ingestion payload error: {message}",
@@ -76,7 +76,7 @@ class IngestionError(ObserveAIException):
         )
 
 
-class ExternalServiceError(ObserveAIException):
+class ExternalServiceError(SentinelAIException):
     def __init__(self, service_name: str, message: str):
         super().__init__(
             message=f"Integration error with {service_name}: {message}",
@@ -86,7 +86,7 @@ class ExternalServiceError(ObserveAIException):
         )
 
 
-class RAGException(ObserveAIException):
+class RAGException(SentinelAIException):
     def __init__(self, message: str):
         super().__init__(
             message=f"RAG Retrieval Error: {message}",

@@ -8,7 +8,7 @@ router = APIRouter(tags=["System Health & Liveness"])
 
 @router.get("/health")
 async def health_check(session: AsyncSession = Depends(get_async_session)):
-    """Full system component health check (Database, Redis, RabbitMQ, ChromaDB, Gemini)."""
+    """Full system component health check (Database, Redis, Google Pub/Sub, ChromaDB, Gemini)."""
     return await health_service.check_health(session)
 
 

@@ -67,7 +67,7 @@ export const TelemetrySection = () => {
             Comprehensive Telemetry Intelligence
           </h2>
           <p className="text-base text-slate-400">
-            ObserveAI ingests five core operational telemetry dimensions to construct a complete timeline of your system state.
+            Sentinel AI ingests five core operational telemetry dimensions to construct a complete timeline of your system state.
           </p>
         </div>
 

@@ -99,7 +99,7 @@ export const Register = () => {
               <Building className="w-4 h-4 absolute left-3.5 top-3 text-slate-500" />
               <input
                 type="text"
-                placeholder="ObserveAI Labs"
+                placeholder="Sentinel AI Labs"
                 value={orgName}
                 onChange={e => setOrgName(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"

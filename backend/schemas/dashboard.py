@@ -35,5 +35,5 @@ class DashboardHealthResponse(BaseModel):
     status: str
     database_connected: bool
     redis_connected: bool
-    rabbitmq_connected: bool
+    pubsub_connected: bool
     chromadb_connected: bool

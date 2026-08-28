@@ -13,6 +13,9 @@ from backend.repositories.telemetry_repository import (
     TelemetryMetricRepository,
     TelemetryTraceRepository,
 )
+from backend.analytics.bigquery_client import bigquery_analytics
+from backend.queue.event_bus import event_bus
+from backend.config.settings import settings
 from backend.utils.logging import logger
 
 
@@ -134,6 +137,7 @@ class IngestionService:
 
         # 5. Deployments
         raw_deployments = payload.get("deployments", [])
+        app_version: str | None = None
         for d in raw_deployments:
             deploy_repo = DeploymentRepository(session)
             deploy_model = Deployment(
@@ -146,6 +150,8 @@ class IngestionService:
                 status=d.get("status", "deployed")
             )
             await deploy_repo.create(deploy_model)
+            if not app_version:
+                app_version = d.get("version")
 
         await session.flush()
 
@@ -164,6 +170,42 @@ class IngestionService:
 
         await session.commit()
 
+        # ── Best-effort: Stream telemetry to BigQuery ───────────────────
+        try:
+            from backend.incidents.detector import compute_fingerprint
+            fp = compute_fingerprint(service_name, raw_logs, raw_exceptions, raw_traces)
+            bigquery_analytics.stream_telemetry(
+                project_id=str(project_id),
+                service_name=service_name,
+                environment=environment,
+                logs=raw_logs,
+                exceptions=raw_exceptions,
+                traces=raw_traces,
+                metrics=raw_metrics,
+                fingerprint=fp,
+                app_version=app_version,
+            )
+        except Exception as bq_exc:
+            logger.warning("BigQuery streaming failed (best-effort)", error=str(bq_exc))
+
+        # ── Best-effort: Publish telemetry event to Pub/Sub ──────────────
+        try:
+            await event_bus.publish(settings.PUBSUB_TELEMETRY_TOPIC, {
+                "event": "telemetry_ingested",
+                "project_id": str(project_id),
+                "service_name": service_name,
+                "environment": environment,
+                "counts": {
+                    "logs": len(log_models),
+                    "exceptions": len(exc_models),
+                    "traces": len(trace_models),
+                    "metrics": len(metric_models),
+                    "deployments": len(raw_deployments),
+                },
+            })
+        except Exception as eb_exc:
+            logger.warning("EventBus telemetry publish failed (best-effort)", error=str(eb_exc))
+
         return {
             "status": "success",
             "processed": {
@@ -176,6 +218,7 @@ class IngestionService:
             "incident_triggered": incident is not None,
             "incident_id": str(incident.id) if incident else None
         }
+
 
 
 ingestion_service = IngestionService()

@@ -1,3 +1,3 @@
-from backend.sdk.client import ObserveAISDKClient
+from backend.sdk.client import SentinelAISDKClient
 
-__all__ = ["ObserveAISDKClient"]
+__all__ = ["SentinelAISDKClient"]

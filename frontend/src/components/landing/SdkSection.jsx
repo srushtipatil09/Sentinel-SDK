@@ -8,8 +8,8 @@ export const SdkSection = () => {
 
   const installCmd = 'npm install github:ShivangiP2005/observai-sdk';
 
-  const nodeSnippet = `const { ObserveAIClient } = require('observai-sdk');
-const client = new ObserveAIClient({ apiKey: 'obs_live_xxx', serviceName: 'checkout-service' });
+  const nodeSnippet = `const { SentinelAIClient } = require('sentinelai-sdk');
+const client = new SentinelAIClient({ apiKey: 'stl_live_xxx', serviceName: 'checkout-service' });
 app.use(client.expressMiddleware());`;
 
   const handleCopyInstall = () => {
@@ -25,7 +25,7 @@ app.use(client.expressMiddleware());`;
   };
 
   const configOptions = [
-    { name: 'apiKey', required: true, default: 'None', desc: 'Required. Your ObserveAI project API key generated in the dashboard.' },
+    { name: 'apiKey', required: true, default: 'None', desc: 'Required. Your Sentinel AI project API key generated in the dashboard.' },
     { name: 'serviceName', required: true, default: 'None', desc: 'Required. Microservice identifier (e.g. "payment-service").' },
     { name: 'endpointUrl', required: false, default: 'http://localhost:8000/api/v1/sdk/ingest', desc: 'Optional. Backend ingestion URL.' },
     { name: 'environment', required: false, default: "'production'", desc: 'Optional. Deployment environment ("development" | "staging" | "production").' },
@@ -44,7 +44,7 @@ app.use(client.expressMiddleware());`;
             Install the SDK, add 3 lines of code with your API key, and telemetry starts flowing automatically.
           </h2>
           <p className="text-base text-slate-400">
-            Plug the official ObserveAI Node.js SDK into your existing services with zero friction.
+            Plug the official Sentinel AI Node.js SDK into your existing services with zero friction.
           </p>
         </div>
 
@@ -94,7 +94,7 @@ app.use(client.expressMiddleware());`;
                 Configure Ingestion Key
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Generate an API key in your ObserveAI dashboard and initialize the client.
+                Generate an API key in your Sentinel AI dashboard and initialize the client.
               </p>
             </div>
 

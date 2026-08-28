@@ -107,7 +107,7 @@ export const Footer = () => {
 
         {/* Footer Bottom */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© 2026 ObserveAI. All rights reserved.</p>
+          <p>© 2026 Sentinel AI. All rights reserved.</p>
           <p className="font-mono text-[11px]">AI-powered observability and autonomous root cause analysis.</p>
         </div>
       </div>

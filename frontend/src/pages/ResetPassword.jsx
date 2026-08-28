@@ -42,7 +42,7 @@ export const ResetPassword = () => {
             Create New Password
           </h1>
           <p className="text-xs text-slate-400">
-            Enter a secure new password for your ObserveAI account.
+            Enter a secure new password for your Sentinel AI account.
           </p>
         </div>
 

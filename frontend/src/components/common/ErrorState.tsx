@@ -15,7 +15,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
 }) => {
   const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
 
-  let message = 'An unexpected error occurred while communicating with ObserveAI servers.';
+  let message = 'An unexpected error occurred while communicating with Sentinel AI servers.';
   let errorCode = 'ERR_UNKNOWN';
   let details: any = null;
 

@@ -33,13 +33,13 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const list = await projectsApi.listProjects();
       setProjects(list);
 
-      const savedProjectId = localStorage.getItem('observeai_active_project_id');
+      const savedProjectId = localStorage.getItem('sentinelai_active_project_id');
       if (savedProjectId && list.some(p => p.id === savedProjectId)) {
         const found = list.find(p => p.id === savedProjectId)!;
         setActiveProject(found);
       } else if (list.length > 0) {
         setActiveProject(list[0]);
-        localStorage.setItem('observeai_active_project_id', list[0].id);
+        localStorage.setItem('sentinelai_active_project_id', list[0].id);
       } else {
         setActiveProject(null);
       }
@@ -58,7 +58,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const found = projects.find(p => p.id === projectId);
     if (found) {
       setActiveProject(found);
-      localStorage.setItem('observeai_active_project_id', found.id);
+      localStorage.setItem('sentinelai_active_project_id', found.id);
     }
   };
 
@@ -66,7 +66,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const created = await projectsApi.createProject(payload);
     setProjects(prev => [created, ...prev]);
     setActiveProject(created);
-    localStorage.setItem('observeai_active_project_id', created.id);
+    localStorage.setItem('sentinelai_active_project_id', created.id);
     return created;
   };
 

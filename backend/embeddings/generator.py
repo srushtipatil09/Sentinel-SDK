@@ -5,68 +5,88 @@ from backend.utils.logging import logger
 
 
 class EmbeddingGenerator:
-    """Generates dense vector embeddings using SentenceTransformers with lazy load & OS fallback."""
+    """Generates 768-dim dense vector embeddings via Google Vertex AI (text-embedding-004).
 
-    def __init__(self):
-        self._model: Optional[Any] = None
-        self._model_failed: bool = False
-        self.model_name = settings.EMBEDDING_MODEL_NAME
+    Falls back to a deterministic pseudo-vector if Vertex AI is unavailable.
+    """
 
-    def _get_model(self) -> Optional[Any]:
-        if self._model_failed:
+    def __init__(self) -> None:
+        self._vertex_model: Optional[Any] = None
+        self._vertex_init_failed: bool = False
+
+    # ── Vertex AI ───────────────────────────────────────────────────────
+    def _get_vertex_model(self) -> Optional[Any]:
+        if self._vertex_init_failed:
+            return None
+        if self._vertex_model is None:
+            try:
+                import vertexai
+                from vertexai.language_models import TextEmbeddingModel
+
+                vertexai.init(project=settings.GCP_PROJECT_ID, location=settings.GCP_LOCATION)
+                self._vertex_model = TextEmbeddingModel.from_pretrained(settings.VERTEX_EMBEDDING_MODEL)
+                logger.info(
+                    "Vertex AI embedding model loaded",
+                    model=settings.VERTEX_EMBEDDING_MODEL,
+                    dim=768,
+                )
+            except Exception as exc:
+                logger.warning(
+                    "Vertex AI embedding model unavailable — using deterministic fallback",
+                    error=str(exc),
+                )
+                self._vertex_init_failed = True
+                return None
+        return self._vertex_model
+
+    def _vertex_embed(self, texts: List[str]) -> Optional[List[List[float]]]:
+        """Attempt a Vertex AI batch embed.  Returns None on failure."""
+        model = self._get_vertex_model()
+        if model is None:
+            return None
+        try:
+            embeddings = model.get_embeddings(texts)
+            return [e.values for e in embeddings]
+        except Exception as exc:
+            logger.warning("Vertex AI embedding call failed", error=str(exc))
             return None
 
-        if self._model is None:
-            try:
-                logger.info("Lazy loading SentenceTransformer model", model_name=self.model_name)
-                from sentence_transformers import SentenceTransformer
-                self._model = SentenceTransformer(self.model_name)
-            except Exception as exc:
-                logger.warning("SentenceTransformer unavailable. Using deterministic vector generator fallback.", error=str(exc))
-                self._model_failed = True
-                return None
-            except BaseException as exc:
-                logger.warning("SentenceTransformer OS DLL load blocked. Using deterministic vector generator fallback.", error=str(exc))
-                self._model_failed = True
-                return None
-
-        return self._model
-
-    def generate_embedding(self, text: str) -> List[float]:
-        """Generates 384-dimensional embedding vector for a string."""
-        if not text or not text.strip():
-            return [0.0] * 384
-
-        model = self._get_model()
-        if model is not None:
-            try:
-                vector = model.encode(text, convert_to_numpy=True)
-                return vector.tolist()
-            except Exception as exc:
-                logger.error("Error running model encode, using fallback vector", error=str(exc))
-
-        # Deterministic normalized 384-dim pseudo-vector fallback
+    # ── Deterministic fallback ──────────────────────────────────────────
+    @staticmethod
+    def _deterministic_vector(text: str, dim: int = 768) -> List[float]:
         seed = abs(hash(text)) % (2**32)
         rng = np.random.RandomState(seed)
-        vec = rng.normal(0, 0.1, 384)
+        vec = rng.normal(0, 0.1, dim)
         norm = np.linalg.norm(vec)
         if norm > 0:
             vec = vec / norm
         return vec.tolist()
 
+    # ── Public API ──────────────────────────────────────────────────────
+    def generate_embedding(self, text: str) -> List[float]:
+        """Generates a 768-dim embedding vector for a string."""
+        if not text or not text.strip():
+            return [0.0] * 768
+
+        # 1. Vertex AI (768-dim)
+        vertex_result = self._vertex_embed([text])
+        if vertex_result is not None:
+            return vertex_result[0]
+
+        # 2. Deterministic fallback (768-dim)
+        return self._deterministic_vector(text, 768)
+
     def generate_batch_embeddings(self, texts: List[str]) -> List[List[float]]:
-        """Generates embedding vectors for a list of strings."""
+        """Generates 768-dim embedding vectors for a list of strings."""
         if not texts:
             return []
-        
-        model = self._get_model()
-        if model is not None:
-            try:
-                vectors = model.encode(texts, convert_to_numpy=True, batch_size=32)
-                return vectors.tolist()
-            except Exception as exc:
-                logger.error("Batch encoding failed, using item fallback", error=str(exc))
 
+        # 1. Vertex AI
+        vertex_result = self._vertex_embed(texts)
+        if vertex_result is not None:
+            return vertex_result
+
+        # 2. Per-item deterministic fallback
         return [self.generate_embedding(t) for t in texts]
 
 

@@ -13,7 +13,7 @@ export const apiClient = axios.create({
 
 // Attach JWT access token to requests
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = localStorage.getItem('observeai_access_token');
+  const token = localStorage.getItem('sentinelai_access_token');
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -33,8 +33,8 @@ apiClient.interceptors.response.use(
   (error: AxiosError<StandardErrorResponse>) => {
     if (error.response?.status === 401) {
       // Clear token and notify app redirect if unauthorized
-      localStorage.removeItem('observeai_access_token');
-      localStorage.removeItem('observeai_refresh_token');
+      localStorage.removeItem('sentinelai_access_token');
+      localStorage.removeItem('sentinelai_refresh_token');
       if (!window.location.pathname.startsWith('/login') && !window.location.pathname.startsWith('/register')) {
         window.location.href = '/login';
       }

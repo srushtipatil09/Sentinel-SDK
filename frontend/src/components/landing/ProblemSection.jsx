@@ -13,7 +13,7 @@ export const ProblemSection = () => {
     '8. Trial and error testing potential bug fixes'
   ];
 
-  const observeAiSteps = [
+  const sentinelAiSteps = [
     { title: 'Telemetry Ingestion', desc: 'SDK streams logs, traces, exceptions, metrics' },
     { title: 'Anomaly Detection', desc: 'Automatic detection of error spikes & latencies' },
     { title: 'Specialized Multi-Agent RCA', desc: 'Planner, Log, Trace, Exception & Metric agents analyze' },
@@ -74,7 +74,7 @@ export const ProblemSection = () => {
             </div>
           </div>
 
-          {/* Right: ObserveAI Workflow (Gain) */}
+          {/* Right: Sentinel AI Workflow (Gain) */}
           <div className="p-6 sm:p-8 rounded-3xl bg-[#172033] border border-blue-500/30 relative space-y-6 flex flex-col justify-between shadow-2xl shadow-blue-500/5">
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-4 border-b border-[#263247]">
@@ -83,7 +83,7 @@ export const ProblemSection = () => {
                     <Zap className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-100">ObserveAI Autonomous Engine</h3>
+                    <h3 className="text-lg font-bold text-slate-100">Sentinel AI Autonomous Engine</h3>
                     <p className="text-xs text-cyan-400 font-medium">Multi-agent correlation & automatic root cause</p>
                   </div>
                 </div>
@@ -93,7 +93,7 @@ export const ProblemSection = () => {
               </div>
 
               <div className="space-y-3">
-                {observeAiSteps.map((step, idx) => (
+                {sentinelAiSteps.map((step, idx) => (
                   <div key={idx} className="p-3 rounded-xl bg-[#0B1120] border border-[#263247] flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <div className="w-6 h-6 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 font-bold text-xs flex items-center justify-center flex-shrink-0">

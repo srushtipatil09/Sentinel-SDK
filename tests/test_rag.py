@@ -26,4 +26,4 @@ def test_embedding_generator_dimension():
     vector = embedding_generator.generate_embedding(text)
 
     assert isinstance(vector, list)
-    assert len(vector) == 384
+    assert len(vector) == 768
