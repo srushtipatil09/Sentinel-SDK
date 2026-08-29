@@ -24,7 +24,13 @@ async def lifespan(app: FastAPI):
     try:
         async with async_engine.begin() as conn:
             def sync_init_db(connection):
-                Base.metadata.create_all(bind=connection, checkfirst=True)
+                for table in Base.metadata.sorted_tables:
+                    try:
+                        table.create(bind=connection, checkfirst=True)
+                        logger.info("Database table verified", table_name=table.name)
+                    except Exception as t_err:
+                        logger.warning("Table creation note", table_name=table.name, error=str(t_err))
+
                 try:
                     from alembic.config import Config
                     from alembic import command
