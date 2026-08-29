@@ -20,29 +20,11 @@ async def lifespan(app: FastAPI):
     setup_logging()
     logger.info("Initializing Sentinel AI Backend Platform", env=settings.APP_ENV)
 
-    # Initialize PostgreSQL Relational Tables & Alembic Migrations
+    # Initialize PostgreSQL Relational Tables
     try:
         async with async_engine.begin() as conn:
-            def sync_init_db(connection):
-                for table in Base.metadata.sorted_tables:
-                    try:
-                        table.create(bind=connection, checkfirst=True)
-                        logger.info("Database table verified", table_name=table.name)
-                    except Exception as t_err:
-                        logger.warning("Table creation note", table_name=table.name, error=str(t_err))
-
-                try:
-                    from alembic.config import Config
-                    from alembic import command
-                    alembic_cfg = Config("alembic.ini")
-                    alembic_cfg.attributes["connection"] = connection
-                    command.upgrade(alembic_cfg, "head")
-                except Exception as alembic_exc:
-                    logger.info("Alembic migration info", note=str(alembic_exc))
-
-            await conn.run_sync(sync_init_db)
-
-        logger.info("Database relational tables and Alembic migrations verified.")
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("Database relational tables initialized successfully.")
     except Exception as exc:
         logger.warning("Database startup table initialization note", error=str(exc))
 
