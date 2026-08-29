@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sentinelai-telemetry-sdk"
+version = "1.0.0"
+description = "Official Python SDK for Sentinel AI Autonomous Observability & Root Cause Analysis Platform."
+readme = "README.md"
+authors = [
+    { name = "Sentinel AI Team" }
+]
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "httpx>=0.24.0",
+]
+requires-python = ">=3.8"
+
+[project.urls]
+"Homepage" = "https://github.com/srushtipatil09/Sentinel-SDK"
+"Bug Tracker" = "https://github.com/srushtipatil09/Sentinel-SDK/issues"
