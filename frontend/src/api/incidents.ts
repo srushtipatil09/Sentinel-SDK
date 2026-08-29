@@ -56,4 +56,9 @@ export const incidentsApi = {
     const res = await apiClient.get<APIResponse<RCAFeedback[]>>(`/incidents/${incidentId}/feedback`);
     return unwrapData(res);
   },
+
+  async reanalyzeIncident(incidentId: string): Promise<Incident> {
+    const res = await apiClient.post<APIResponse<Incident>>(`/incidents/${incidentId}/investigate`);
+    return unwrapData(res);
+  },
 };

@@ -53,12 +53,18 @@ export const IncidentDetail = () => {
     fetchDetails();
   }, [incidentId]);
 
-  const handleReanalyzeAI = () => {
+  const handleReanalyzeAI = async () => {
+    if (!incidentId) return;
     setIsReanalyzing(true);
-    setTimeout(() => {
-      setIsReanalyzing(false);
+    try {
+      const updated = await incidentsApi.reanalyzeIncident(incidentId);
+      setIncident(updated);
+    } catch (err) {
+      console.error('Failed to run AI investigation:', err);
       fetchDetails();
-    }, 2500);
+    } finally {
+      setIsReanalyzing(false);
+    }
   };
 
   const handleAddComment = async (e) => {

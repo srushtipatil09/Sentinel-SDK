@@ -111,3 +111,17 @@ async def add_incident_comment(
         message="Comment added successfully.",
         data=IncidentCommentResponse.model_validate(comment)
     )
+
+
+@router.post("/{incident_id}/investigate", response_model=APIResponse[IncidentDetailResponse])
+async def investigate_incident(
+    incident_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_async_session)
+):
+    """Triggers on-demand multi-agent AI Root Cause Analysis (RCA) investigation for an incident."""
+    updated = await incident_service.investigate_incident(session, incident_id, current_user.organization_id)
+    return APIResponse(
+        message="AI RCA multi-agent investigation completed successfully.",
+        data=IncidentDetailResponse.model_validate(updated)
+    )

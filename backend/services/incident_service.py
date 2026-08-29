@@ -110,6 +110,75 @@ class IncidentService:
         await session.flush()
         return comment
 
+    async def investigate_incident(
+        self,
+        session: AsyncSession,
+        incident_id: uuid.UUID,
+        organization_id: uuid.UUID
+    ) -> Incident:
+        from backend.api.dependencies import verify_incident_ownership
+        from backend.incidents.detector import incident_detector
+        from backend.repositories.telemetry_repository import (
+            TelemetryExceptionRepository,
+            TelemetryLogRepository,
+            TelemetryTraceRepository,
+        )
+        from backend.repositories.project_repository import ServiceRepository
+
+        incident = await verify_incident_ownership(session, incident_id, organization_id)
+        service_repo = ServiceRepository(session)
+        service = await service_repo.get_by_id(incident.service_id)
+        service_name = service.name if service else "unknown-service"
+
+        # Fetch recent telemetry logs, exceptions, traces
+        log_repo = TelemetryLogRepository(session)
+        exc_repo = TelemetryExceptionRepository(session)
+        trace_repo = TelemetryTraceRepository(session)
+
+        raw_logs_models = await log_repo.query_logs(
+            project_id=incident.project_id,
+            service_id=incident.service_id,
+            limit=20
+        )
+        raw_exc_models = await exc_repo.query_exceptions(
+            project_id=incident.project_id,
+            service_id=incident.service_id,
+            limit=10
+        )
+        raw_trace_models = await trace_repo.get_slow_spans(
+            project_id=incident.project_id,
+            service_id=incident.service_id,
+            min_duration_ms=0.0,
+            limit=20
+        )
+
+        logs = [
+            {"level": l.level, "message": l.message, "timestamp": l.timestamp.isoformat() if l.timestamp else None}
+            for l in raw_logs_models
+        ]
+        exceptions = [
+            {"exception_type": e.exception_type, "message": e.message, "stacktrace": e.stacktrace, "handled": e.handled}
+            for e in raw_exc_models
+        ]
+        traces = [
+            {"operation_name": t.operation_name, "duration_ms": t.duration_ms, "status_code": t.status_code, "endpoint": t.operation_name}
+            for t in raw_trace_models
+        ]
+
+        await incident_detector._trigger_ai_rca_workflow(
+            session=session,
+            incident=incident,
+            service_name=service_name,
+            logs=logs,
+            exceptions=exceptions,
+            traces=traces,
+            metrics={"count": len(traces)},
+            deployments=[]
+        )
+
+        await session.flush()
+        return await verify_incident_ownership(session, incident_id, organization_id)
+
 
 incident_service = IncidentService()
 
