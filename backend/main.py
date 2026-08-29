@@ -3,6 +3,7 @@ from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+import backend.models  # Import all ORM models to register schemas with Base.metadata
 from backend.api import api_v1_router
 from backend.api.middleware.error_handler import global_exception_handler, sentinelai_exception_handler
 from backend.cache.redis_client import redis_cache
@@ -22,20 +23,22 @@ async def lifespan(app: FastAPI):
     # Initialize PostgreSQL Relational Tables & Alembic Migrations
     try:
         async with async_engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
+            def sync_init_db(connection):
+                Base.metadata.create_all(bind=connection, checkfirst=True)
+                try:
+                    from alembic.config import Config
+                    from alembic import command
+                    alembic_cfg = Config("alembic.ini")
+                    alembic_cfg.attributes["connection"] = connection
+                    command.upgrade(alembic_cfg, "head")
+                except Exception as alembic_exc:
+                    logger.info("Alembic migration info", note=str(alembic_exc))
 
-            def run_alembic_upgrade(connection):
-                from alembic.config import Config
-                from alembic import command
-                alembic_cfg = Config("alembic.ini")
-                alembic_cfg.attributes["connection"] = connection
-                command.upgrade(alembic_cfg, "head")
-
-            await conn.run_sync(run_alembic_upgrade)
+            await conn.run_sync(sync_init_db)
 
         logger.info("Database relational tables and Alembic migrations verified.")
     except Exception as exc:
-        logger.warning("Database startup table initialization skipped or retryable.", error=str(exc))
+        logger.warning("Database startup table initialization note", error=str(exc))
 
     # ── GCP service provisioning ────────────────────────────────────────
     gcp_active: list[str] = []
