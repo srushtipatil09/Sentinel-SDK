@@ -143,7 +143,7 @@ class Settings(BaseSettings):
 
     # RAG Settings
     RAG_TOP_K: int = 5
-    RAG_SIMILARITY_THRESHOLD: float = 0.65
+    RAG_SIMILARITY_THRESHOLD: float = 0.50
     CHUNK_SIZE: int = 1000
     CHUNK_OVERLAP: int = 150
 

@@ -29,9 +29,11 @@ class RAGPipeline:
         """Generates multiple search query representations for higher recall."""
         queries = [incident_title]
         if exception_msg:
-            # Clean exception query
             clean_exc = exception_msg.split(":")[0] if ":" in exception_msg else exception_msg
             queries.append(f"{service_name} {clean_exc}")
+        if "latency" in incident_title.lower() or "slow" in incident_title.lower() or "operational" in incident_title.lower():
+            queries.append("Slow endpoint high latency database query optimization runbook")
+            queries.append("API performance bottleneck remediation playbook")
         queries.append(f"Root cause and fix for {service_name} failure {incident_title}")
         return queries
 
@@ -63,9 +65,6 @@ class RAGPipeline:
                     query_embedding=query_vector,
                     project_id=project_id,
                     top_k=top_k,
-                    service=service_name,
-                    environment=environment,
-                    severity=severity,
                     organization_id=organization_id
                 )
                 for item in results:
