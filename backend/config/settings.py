@@ -106,7 +106,7 @@ class Settings(BaseSettings):
 
     # AI & LLM Settings
     GEMINI_API_KEY: str = Field(default="", description="Google Gemini API Key")
-    GEMINI_MODEL: str = "gemini-2.5-flash"
+    GEMINI_MODEL: str = "gemini-1.5-flash"
     GEMINI_TEMPERATURE: float = 0.2
     GEMINI_MAX_TOKENS: int = 4096
 

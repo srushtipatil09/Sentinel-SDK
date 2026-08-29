@@ -84,25 +84,35 @@ Return ONLY a valid, raw JSON object (without markdown code blocks) strictly adh
 }}
 """
 
-        try:
-            logger.info(f"Using Gemini model: {self.model_name}")
-            model = genai.GenerativeModel(
-                model_name=self.model_name,
-                generation_config={"temperature": settings.GEMINI_TEMPERATURE, "max_output_tokens": settings.GEMINI_MAX_TOKENS}
-            )
-            response = model.generate_content(prompt)
-            raw_text = response.text.strip()
-            
-            # Clean markdown codeblocks if present
-            if raw_text.startswith("```"):
-                raw_text = raw_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+        candidate_models = [self.model_name, "gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro"]
+        # Deduplicate while preserving order
+        unique_models = []
+        for m in candidate_models:
+            if m and m not in unique_models:
+                unique_models.append(m)
 
-            rca_data = json.loads(raw_text)
-            logger.info("Successfully generated RCA report via Gemini 2.5", service=incident_context.get('service_name'))
-            return rca_data
-        except Exception as exc:
-            logger.error("Gemini RCA generation failed", error=str(exc))
-            return self._generate_fallback_rca(incident_context, confidence_meta)
+        for candidate in unique_models:
+            try:
+                logger.info(f"Attempting RCA generation with Gemini model: {candidate}")
+                model = genai.GenerativeModel(
+                    model_name=candidate,
+                    generation_config={"temperature": settings.GEMINI_TEMPERATURE, "max_output_tokens": settings.GEMINI_MAX_TOKENS}
+                )
+                response = model.generate_content(prompt)
+                raw_text = response.text.strip()
+                
+                # Clean markdown codeblocks if present
+                if raw_text.startswith("```"):
+                    raw_text = raw_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+
+                rca_data = json.loads(raw_text)
+                logger.info(f"Successfully generated RCA report via Gemini ({candidate})", service=incident_context.get('service_name'))
+                return rca_data
+            except Exception as candidate_exc:
+                logger.warning(f"Gemini model {candidate} generation attempt failed: {candidate_exc}")
+
+        logger.error("All Gemini model candidates exhausted. Falling back to deterministic heuristic RCA.")
+        return self._generate_fallback_rca(incident_context, confidence_meta)
 
     def _generate_fallback_rca(
         self,
