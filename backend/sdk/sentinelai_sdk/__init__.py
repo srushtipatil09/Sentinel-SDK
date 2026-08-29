@@ -1,3 +1,3 @@
-from sentinelai_sdk.client import SentinelAISDKClient
+from .client import SentinelAISDKClient
 
 __all__ = ["SentinelAISDKClient"]

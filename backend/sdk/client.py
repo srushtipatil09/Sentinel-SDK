@@ -127,14 +127,14 @@ class SentinelAISDKClient:
                 headers = {"X-API-Key": self.api_key}
                 resp = client.post(self.endpoint_url, json=payload, headers=headers)
                 if resp.status_code == 202:
-                    logger.info("SDK flushed telemetry batch successfully", items=sum(len(v) for v in self._buffer.values()))
+                    logger.info("SDK flushed telemetry batch successfully")
                     self._clear_buffer()
                     return True
                 else:
-                    logger.error("SDK flush failed", status_code=resp.status_code)
+                    logger.error(f"SDK flush failed with status code {resp.status_code}")
                     return False
         except Exception as exc:
-            logger.error("SDK network transport failed", error=str(exc))
+            logger.error(f"SDK network transport failed: {exc}")
             return False
 
     def _clear_buffer(self) -> None:

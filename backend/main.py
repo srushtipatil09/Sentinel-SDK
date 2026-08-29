@@ -94,10 +94,12 @@ app.add_middleware(RateLimitMiddleware, requests_per_minute=settings.RATE_LIMIT_
 # CORS Middleware (Registered outermost to immediately handle preflight OPTIONS requests & attach headers)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=["*"],
+    allow_origin_regex=r".*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Exception Handlers
