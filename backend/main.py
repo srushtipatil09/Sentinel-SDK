@@ -20,23 +20,22 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing Sentinel AI Backend Platform", env=settings.APP_ENV)
 
     # Initialize PostgreSQL Relational Tables & Alembic Migrations
-    if settings.APP_ENV == "development":
-        try:
-            async with async_engine.begin() as conn:
-                await conn.run_sync(Base.metadata.create_all)
+    try:
+        async with async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
 
-                def run_alembic_upgrade(connection):
-                    from alembic.config import Config
-                    from alembic import command
-                    alembic_cfg = Config("alembic.ini")
-                    alembic_cfg.attributes["connection"] = connection
-                    command.upgrade(alembic_cfg, "head")
+            def run_alembic_upgrade(connection):
+                from alembic.config import Config
+                from alembic import command
+                alembic_cfg = Config("alembic.ini")
+                alembic_cfg.attributes["connection"] = connection
+                command.upgrade(alembic_cfg, "head")
 
-                await conn.run_sync(run_alembic_upgrade)
+            await conn.run_sync(run_alembic_upgrade)
 
-            logger.info("Database relational tables and Alembic migrations verified.")
-        except Exception as exc:
-            logger.warning("Database connection currently unreachable at startup. Endpoints will retry on request.", error=str(exc))
+        logger.info("Database relational tables and Alembic migrations verified.")
+    except Exception as exc:
+        logger.warning("Database startup table initialization skipped or retryable.", error=str(exc))
 
     # ── GCP service provisioning ────────────────────────────────────────
     gcp_active: list[str] = []
