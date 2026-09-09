@@ -1,3 +1,4 @@
+import re
 import statistics
 import time
 import uuid
@@ -253,28 +254,91 @@ class LangGraphRCAWorkflow:
         repeated = [t for t, count in type_counter.items() if count > 1]
 
         stacktrace_snippet = "N/A"
-        affected_files = []
-        affected_functions = []
+        raw_files = []
+        raw_functions = []
+        raw_lines = []
 
         for e in exceptions:
+            # Check explicit metadata if supplied by SDK
+            if e.get("file_name"):
+                raw_files.append(str(e["file_name"]).replace("\\", "/"))
+            if e.get("function_name"):
+                raw_functions.append(str(e["function_name"]))
+            if e.get("line_number"):
+                try:
+                    raw_lines.append(int(e["line_number"]))
+                except Exception:
+                    pass
+
             st = e.get("stacktrace") or e.get("stack_trace") or ""
             if st:
                 if stacktrace_snippet == "N/A":
-                    stacktrace_snippet = st[:400]
+                    stacktrace_snippet = st[:800]
                 lines = st.split("\n")
                 for line in lines:
-                    if "File " in line:
-                        parts = line.strip().split(",")
-                        for p in parts:
-                            if "File " in p:
-                                f_name = p.replace("File ", "").strip("'\" ")
-                                affected_files.append(f_name)
-                            elif "in " in p:
-                                func_name = p.replace("in ", "").strip()
-                                affected_functions.append(func_name)
+                    line_str = line.strip()
 
-        affected_files = list(set(affected_files))
-        affected_functions = list(set(affected_functions))
+                    # Python traceback: File "...", line 123, in func_name
+                    py_match = re.search(r'File ["\']([^"\']+)["\'], line (\d+)(?:, in (.+))?', line_str)
+                    if py_match:
+                        f_path = py_match.group(1).replace("\\", "/")
+                        l_num = py_match.group(2)
+                        f_name = py_match.group(3).strip() if py_match.group(3) else None
+                        raw_files.append(f_path)
+                        try:
+                            raw_lines.append(int(l_num))
+                        except Exception:
+                            pass
+                        if f_name:
+                            raw_functions.append(f_name)
+                        continue
+
+                    # Node.js / V8 traceback: at func (path/to/file.js:12:34) OR at path/to/file.js:12:34
+                    node_match = re.search(r'at (?:([^\s(]+)\s+\((.+?):(\d+):(\d+)\)|(.+?):(\d+):(\d+))', line_str)
+                    if node_match:
+                        if node_match.group(2):
+                            fn = node_match.group(1).strip()
+                            fp = node_match.group(2).replace("\\", "/")
+                            ln = node_match.group(3)
+                        else:
+                            fn = None
+                            fp = node_match.group(5).replace("\\", "/")
+                            ln = node_match.group(6)
+
+                        raw_files.append(fp)
+                        try:
+                            raw_lines.append(int(ln))
+                        except Exception:
+                            pass
+                        if fn and not fn.startswith("new ") and "anonymous" not in fn.lower():
+                            raw_functions.append(fn)
+                        continue
+
+                    # Java / Kotlin traceback: at com.example.Class.method(File.java:123)
+                    java_match = re.search(r'at ([\w.$]+)\(([\w.-]+):(\d+)\)', line_str)
+                    if java_match:
+                        raw_functions.append(java_match.group(1))
+                        raw_files.append(java_match.group(2))
+                        try:
+                            raw_lines.append(int(java_match.group(3)))
+                        except Exception:
+                            pass
+                        continue
+
+        def is_app_file(p: str) -> bool:
+            lower = p.lower()
+            return not any(ignored in lower for ignored in [
+                "node_modules", "internal/modules", "internal/process",
+                "site-packages", "lib/python", "<anonymous>", "express/lib"
+            ])
+
+        app_files = [f for f in raw_files if is_app_file(f)]
+        affected_files = list(dict.fromkeys(app_files if app_files else raw_files))
+        affected_functions = list(dict.fromkeys([
+            fn for fn in raw_functions
+            if not any(ign in fn.lower() for ign in ["handle_request", "process_ticks", "run_microtasks", "layer.handle"])
+        ]))
+        affected_lines = list(dict.fromkeys(raw_lines))
 
         state.exception_analysis = {
             "primary_exception": primary_exc,
@@ -283,6 +347,7 @@ class LangGraphRCAWorkflow:
             "stacktrace_summary": stacktrace_snippet,
             "affected_files": affected_files,
             "affected_functions": affected_functions,
+            "affected_lines": affected_lines,
             "most_common_exception": most_common_type,
             "error_chain": exc_types
         }
@@ -291,7 +356,8 @@ class LangGraphRCAWorkflow:
             f"Parsed {len(exceptions)} exception payloads ({len(unhandled)} unhandled).",
             f"Primary exception identified: '{primary_exc}'.",
             f"Affected source files: {', '.join(affected_files[:3]) if affected_files else 'None extracted'}.",
-            f"Affected functions: {', '.join(affected_functions[:3]) if affected_functions else 'None extracted'}."
+            f"Affected functions: {', '.join(affected_functions[:3]) if affected_functions else 'None extracted'}.",
+            f"Failing line numbers: {', '.join(str(l) for l in affected_lines[:3]) if affected_lines else 'None extracted'}."
         ]
 
         state.agent_reasoning.append({

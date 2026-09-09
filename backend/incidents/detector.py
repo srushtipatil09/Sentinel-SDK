@@ -396,34 +396,52 @@ class IncidentDetector:
             if final_state.final_rca:
                 rca_dict = final_state.final_rca
 
-                # Persist RcaReport record
+                # Persist or update RcaReport record
                 rca_repo = RcaReportRepository(session)
-                report_model = RcaReport(
-                    incident_id=incident.id,
-                    project_id=incident.project_id,
-                    summary=rca_dict.get("summary", "Summary unavailable."),
-                    root_cause=rca_dict.get("root_cause", "Root cause under investigation."),
-                    timeline_json=rca_dict.get("timeline", []),
-                    evidence_json=rca_dict.get("evidence", {}),
-                    historical_matches_json=rca_dict.get("historical_matches", []),
-                    fix_recommendations_json=rca_dict.get("fix_recommendations", []),
-                    prevention_actions_json=rca_dict.get("prevention_actions", []),
-                    confidence_score=float(rca_dict.get("confidence_score", 0.85)),
-                    confidence_level=final_state.confidence_meta.get("confidence_level", "HIGH"),
-                    reasoning_tree_json={
-                        "executed_agents": final_state.executed_agents,
-                        "planner_decisions": final_state.execution_plan,
-                        "agent_reasoning": final_state.agent_reasoning,
-                        "confidence_reasoning": final_state.confidence_analysis,
-                        "historical_matches": final_state.rag_analysis.get("historical_matches", []),
-                        "latency_analysis": final_state.trace_analysis,
-                        "deployment_correlation": final_state.deployment_analysis,
-                        "log_analysis": final_state.log_analysis,
-                        "exception_analysis": final_state.exception_analysis,
-                        "metric_analysis": final_state.metric_analysis
-                    }
-                )
-                await rca_repo.create(report_model)
+                existing_report = await rca_repo.get_by_incident_id(incident.id)
+                reasoning_tree = {
+                    "executed_agents": final_state.executed_agents,
+                    "planner_decisions": final_state.execution_plan,
+                    "agent_reasoning": final_state.agent_reasoning,
+                    "confidence_reasoning": final_state.confidence_analysis,
+                    "historical_matches": final_state.rag_analysis.get("historical_matches", []),
+                    "latency_analysis": final_state.trace_analysis,
+                    "deployment_correlation": final_state.deployment_analysis,
+                    "log_analysis": final_state.log_analysis,
+                    "exception_analysis": final_state.exception_analysis,
+                    "metric_analysis": final_state.metric_analysis
+                }
+
+                if existing_report:
+                    existing_report.summary = rca_dict.get("summary", "Summary unavailable.")
+                    existing_report.root_cause = rca_dict.get("root_cause", "Root cause under investigation.")
+                    existing_report.timeline_json = rca_dict.get("timeline", [])
+                    existing_report.evidence_json = rca_dict.get("evidence", {}) or {}
+                    existing_report.historical_matches_json = rca_dict.get("historical_matches", [])
+                    existing_report.fix_recommendations_json = rca_dict.get("fix_recommendations", [])
+                    existing_report.prevention_actions_json = rca_dict.get("prevention_actions", [])
+                    existing_report.confidence_score = float(rca_dict.get("confidence_score", 0.85))
+                    existing_report.confidence_level = final_state.confidence_meta.get("confidence_level", "HIGH")
+                    existing_report.reasoning_tree_json = reasoning_tree
+                    report_model = existing_report
+                    incident.rca_report = existing_report
+                else:
+                    report_model = RcaReport(
+                        incident_id=incident.id,
+                        project_id=incident.project_id,
+                        summary=rca_dict.get("summary", "Summary unavailable."),
+                        root_cause=rca_dict.get("root_cause", "Root cause under investigation."),
+                        timeline_json=rca_dict.get("timeline", []),
+                        evidence_json=rca_dict.get("evidence", {}) or {},
+                        historical_matches_json=rca_dict.get("historical_matches", []),
+                        fix_recommendations_json=rca_dict.get("fix_recommendations", []),
+                        prevention_actions_json=rca_dict.get("prevention_actions", []),
+                        confidence_score=float(rca_dict.get("confidence_score", 0.85)),
+                        confidence_level=final_state.confidence_meta.get("confidence_level", "HIGH"),
+                        reasoning_tree_json=reasoning_tree
+                    )
+                    await rca_repo.create(report_model)
+                    incident.rca_report = report_model
 
                 # Update Incident status
                 incident.status = "INVESTIGATING"

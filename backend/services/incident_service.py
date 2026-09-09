@@ -140,17 +140,38 @@ class IncidentService:
             service_id=incident.service_id,
             limit=20
         )
+        if not raw_logs_models and incident.service_id:
+            raw_logs_models = await log_repo.query_logs(
+                project_id=incident.project_id,
+                service_id=None,
+                limit=20
+            )
+
         raw_exc_models = await exc_repo.query_exceptions(
             project_id=incident.project_id,
             service_id=incident.service_id,
             limit=10
         )
+        if not raw_exc_models and incident.service_id:
+            raw_exc_models = await exc_repo.query_exceptions(
+                project_id=incident.project_id,
+                service_id=None,
+                limit=10
+            )
+
         raw_trace_models = await trace_repo.get_slow_spans(
             project_id=incident.project_id,
             service_id=incident.service_id,
             min_duration_ms=0.0,
             limit=20
         )
+        if not raw_trace_models and incident.service_id:
+            raw_trace_models = await trace_repo.get_slow_spans(
+                project_id=incident.project_id,
+                service_id=None,
+                min_duration_ms=0.0,
+                limit=20
+            )
 
         logs = [
             {"level": l.level, "message": l.message, "timestamp": l.timestamp.isoformat() if l.timestamp else None}
@@ -176,7 +197,8 @@ class IncidentService:
             deployments=[]
         )
 
-        await session.flush()
+        await session.commit()
+        session.expire_all()
         return await verify_incident_ownership(session, incident_id, organization_id)
 
 
