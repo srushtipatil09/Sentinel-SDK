@@ -159,11 +159,12 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
 
     # Notification & SMTP Settings
+    RESEND_API_KEY: Optional[str] = None
     SMTP_HOST: Optional[str] = None
     SMTP_PORT: int = 587
     SMTP_USER: Optional[str] = None
     SMTP_PASSWORD: Optional[str] = None
-    EMAILS_FROM_EMAIL: str = "alerts@sentinelai.io"
+    EMAILS_FROM_EMAIL: str = "onboarding@resend.dev"
     EMAILS_FROM_NAME: str = "Sentinel AI Alerts"
 
     # Observability

@@ -58,10 +58,19 @@ class NotificationEngine:
                     "title": incident_title,
                     "summary": rca_summary
                 })
-            elif channel == "email" and settings.SMTP_HOST:
-                target_email = config.settings_json.get("email", settings.EMAILS_FROM_EMAIL)
+            elif channel == "email":
+                target_email = (config.settings_json or {}).get("email") or config.target_url or settings.EMAILS_FROM_EMAIL
                 recipient = target_email
-                success = self._send_email(target_email, f"[{severity}] Sentinel AI Incident: {service_name}", message_body)
+                has_resend = bool(settings.RESEND_API_KEY or (settings.SMTP_PASSWORD and settings.SMTP_PASSWORD.startswith("re_")))
+                has_smtp = bool(settings.SMTP_HOST and settings.SMTP_USER)
+                if has_resend or has_smtp:
+                    success = self._send_email(target_email, f"[{severity}] Sentinel AI Incident: {service_name}", message_body)
+                    if not success:
+                        error_msg = f"Failed to send email to {target_email} via Resend/SMTP."
+                else:
+                    error_msg = "Email service (Resend / SMTP) not configured in backend environment. Email dispatch skipped."
+                    logger.warning("Email not configured. Skipping incident email alert.", email=target_email)
+                    success = False
             else:
                 logger.info("Notification target simulation", channel=channel, target=recipient)
                 success = True
@@ -114,19 +123,24 @@ class NotificationEngine:
                     "message": "Sentinel AI webhook channel verification successful."
                 })
             elif channel == "email":
-                target_email = config.settings_json.get("email", settings.EMAILS_FROM_EMAIL)
+                target_email = (config.settings_json or {}).get("email") or config.target_url or settings.EMAILS_FROM_EMAIL
                 recipient = target_email
-                if settings.SMTP_HOST and settings.SMTP_USER:
+                has_resend = bool(settings.RESEND_API_KEY or (settings.SMTP_PASSWORD and settings.SMTP_PASSWORD.startswith("re_")))
+                has_smtp = bool(settings.SMTP_HOST and settings.SMTP_USER)
+                if has_resend or has_smtp:
                     success = self._send_email(target_email, "Sentinel AI - Channel Test Notification", test_message)
+                    if not success:
+                        error_msg = f"Failed to deliver email to {target_email}. Check Resend API key or SMTP credentials."
                 else:
-                    logger.info("SMTP not configured. Simulating email channel verification.", email=target_email)
-                    success = True
+                    error_msg = "Neither Resend nor SMTP is configured on the backend. Set RESEND_API_KEY or SMTP credentials in environment."
+                    logger.warning("Email service not configured. Skipping test email dispatch.", email=target_email)
+                    success = False
             else:
                 logger.info("Notification target simulation", channel=channel, target=recipient)
                 success = True
 
             if not success and not error_msg:
-                error_msg = f"{channel.capitalize()} endpoint rejected the webhook request."
+                error_msg = f"{channel.capitalize()} endpoint rejected the notification request."
         except Exception as exc:
             error_msg = str(exc)
             logger.error("Failed to send test notification", channel=channel, error=error_msg)
@@ -209,21 +223,62 @@ class NotificationEngine:
             return resp.status_code < 400
 
     def _send_email(self, recipient_email: str, subject: str, body: str) -> bool:
+        # 1. Resend REST API (High performance, bypasses cloud SMTP port blocks)
+        resend_key = settings.RESEND_API_KEY or (
+            settings.SMTP_PASSWORD if (settings.SMTP_PASSWORD or "").startswith("re_") else None
+        )
+        if resend_key:
+            try:
+                from_email = settings.EMAILS_FROM_EMAIL
+                if not from_email or "sentinelai.io" in from_email:
+                    from_email = "onboarding@resend.dev"
+                from_header = f"{settings.EMAILS_FROM_NAME} <{from_email}>" if settings.EMAILS_FROM_NAME else from_email
+
+                resp = httpx.post(
+                    "https://api.resend.com/emails",
+                    headers={
+                        "Authorization": f"Bearer {resend_key.strip()}",
+                        "Content-Type": "application/json"
+                    },
+                    json={
+                        "from": from_header,
+                        "to": [recipient_email],
+                        "subject": subject,
+                        "text": body
+                    },
+                    timeout=10.0
+                )
+                if resp.status_code in (200, 201):
+                    logger.info("Email dispatched successfully via Resend API", recipient=recipient_email)
+                    return True
+                else:
+                    logger.warning("Resend API rejected email dispatch", status_code=resp.status_code, response=resp.text)
+            except Exception as resend_exc:
+                logger.warning("Resend API dispatch failed, attempting SMTP fallback", error=str(resend_exc))
+
+        # 2. Standard SMTP Dispatch
         if not settings.SMTP_HOST or not settings.SMTP_USER:
             logger.warning("SMTP credentials not configured. Skipping email dispatch.")
             return False
 
         try:
             msg = MIMEMultipart()
-            msg["From"] = settings.EMAILS_FROM_EMAIL
+            from_addr = f"{settings.EMAILS_FROM_NAME} <{settings.EMAILS_FROM_EMAIL}>" if settings.EMAILS_FROM_NAME else settings.EMAILS_FROM_EMAIL
+            msg["From"] = from_addr
             msg["To"] = recipient_email
             msg["Subject"] = subject
             msg.attach(MIMEText(body, "plain"))
 
-            with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
-                server.starttls()
-                server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-                server.send_message(msg)
+            port = int(settings.SMTP_PORT or 587)
+            if port == 465:
+                with smtplib.SMTP_SSL(settings.SMTP_HOST, port, timeout=10.0) as server:
+                    server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+                    server.send_message(msg)
+            else:
+                with smtplib.SMTP(settings.SMTP_HOST, port, timeout=10.0) as server:
+                    server.starttls()
+                    server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+                    server.send_message(msg)
             return True
         except Exception as exc:
             logger.error("SMTP email send failed", recipient=recipient_email, error=str(exc))
