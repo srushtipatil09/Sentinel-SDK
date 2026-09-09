@@ -24,8 +24,8 @@ class NotificationConfig(BaseModel):
 class NotificationHistory(BaseModel):
     __tablename__ = "notification_histories"
 
-    incident_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("incidents.id", ondelete="CASCADE"), nullable=False, index=True
+    incident_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("incidents.id", ondelete="CASCADE"), nullable=True, index=True
     )
     channel_type: Mapped[str] = mapped_column(String(50), nullable=False)
     recipient: Mapped[str] = mapped_column(String(255), nullable=False)

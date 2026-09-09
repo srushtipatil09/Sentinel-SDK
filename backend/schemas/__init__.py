@@ -10,6 +10,13 @@ from backend.schemas.profile import ProfileResponse, UpdateProfileRequest, Chang
 from backend.schemas.dashboard import DashboardOverviewResponse, DashboardProjectsSummary, DashboardTelemetrySummary, DashboardHealthResponse
 from backend.schemas.search import SearchQuery, SearchResultItem, SearchResponse
 from backend.schemas.feedback import RCAFeedbackCreate, RCAFeedbackResponse
+from backend.schemas.notifications import (
+    NotificationConfigCreate,
+    NotificationConfigUpdate,
+    NotificationConfigResponse,
+    NotificationHistoryResponse,
+    NotificationTestResponse,
+)
 
 __all__ = [
     "APIResponse",
@@ -64,4 +71,9 @@ __all__ = [
     "SearchResponse",
     "RCAFeedbackCreate",
     "RCAFeedbackResponse",
+    "NotificationConfigCreate",
+    "NotificationConfigUpdate",
+    "NotificationConfigResponse",
+    "NotificationHistoryResponse",
+    "NotificationTestResponse",
 ]

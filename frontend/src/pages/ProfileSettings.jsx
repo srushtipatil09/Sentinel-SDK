@@ -18,7 +18,8 @@ import {
   Key,
   Trash2,
   ArrowRightLeft,
-  Users
+  Users,
+  Bell
 } from 'lucide-react';
 
 export const ProfileSettings = () => {
@@ -29,6 +30,13 @@ export const ProfileSettings = () => {
   const [timezone, setTimezone] = useState(user?.timezone || 'UTC');
   const [profileMsg, setProfileMsg] = useState({ type: '', text: '' });
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+
+  // Notification preferences state
+  const [emailAlerts, setEmailAlerts] = useState(user?.notification_preferences?.email ?? true);
+  const [dailyDigest, setDailyDigest] = useState(user?.notification_preferences?.daily_summary ?? true);
+  const [notifSeverity, setNotifSeverity] = useState(user?.notification_preferences?.severity_filter || 'P2');
+  const [notifMsg, setNotifMsg] = useState({ type: '', text: '' });
+  const [isUpdatingNotif, setIsUpdatingNotif] = useState(false);
 
   // Security & password state
   const [currentPassword, setCurrentPassword] = useState('');
@@ -65,9 +73,36 @@ export const ProfileSettings = () => {
     if (user) {
       setFullName(user.full_name || '');
       setTimezone(user.timezone || 'UTC');
+      setEmailAlerts(user.notification_preferences?.email ?? true);
+      setDailyDigest(user.notification_preferences?.daily_summary ?? true);
+      setNotifSeverity(user.notification_preferences?.severity_filter || 'P2');
       fetchOrgMembers();
     }
   }, [user]);
+
+  const handleUpdateNotifications = async (e) => {
+    e.preventDefault();
+    setNotifMsg({ type: '', text: '' });
+    setIsUpdatingNotif(true);
+
+    try {
+      await profileApi.updateProfile({
+        notification_preferences: {
+          email: emailAlerts,
+          daily_summary: dailyDigest,
+          severity_filter: notifSeverity,
+          instant_alerts: emailAlerts,
+        },
+      });
+      await refreshUser();
+      setNotifMsg({ type: 'success', text: 'Notification preferences updated successfully.' });
+    } catch (err) {
+      console.error('Failed to update notification preferences:', err);
+      setNotifMsg({ type: 'error', text: err.message || 'Failed to update notification preferences.' });
+    } finally {
+      setIsUpdatingNotif(false);
+    }
+  };
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
@@ -411,6 +446,96 @@ export const ProfileSettings = () => {
               >
                 <Lock className="w-4 h-4 text-amber-400" />
                 {isChangingPass ? 'Updating Password...' : 'Update Password'}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Personal Notification Preferences Card */}
+        <div className="p-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-5">
+          <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <Bell className="w-5 h-5 text-brand-500" />
+            <h3 className="font-bold text-base text-slate-900 dark:text-slate-100">
+              Notification Preferences
+            </h3>
+          </div>
+
+          {notifMsg.text && (
+            <div
+              className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
+                notifMsg.type === 'success'
+                  ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                  : 'bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400'
+              }`}
+            >
+              {notifMsg.type === 'success' ? (
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+              ) : (
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              )}
+              <span>{notifMsg.text}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleUpdateNotifications} className="space-y-4">
+            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800">
+              <div>
+                <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                  Direct Email Incident Alerts
+                </p>
+                <p className="text-[11px] text-slate-400">
+                  Receive email alerts when high-severity anomalies trigger incidents
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                checked={emailAlerts}
+                onChange={(e) => setEmailAlerts(e.target.checked)}
+                className="w-4 h-4 text-brand-500 rounded focus:ring-brand-500 cursor-pointer"
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800">
+              <div>
+                <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                  Daily System Digest
+                </p>
+                <p className="text-[11px] text-slate-400">
+                  Receive a daily summary of resolved incidents and service health
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                checked={dailyDigest}
+                onChange={(e) => setDailyDigest(e.target.checked)}
+                className="w-4 h-4 text-brand-500 rounded focus:ring-brand-500 cursor-pointer"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">
+                Minimum Alert Severity
+              </label>
+              <select
+                value={notifSeverity}
+                onChange={(e) => setNotifSeverity(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              >
+                <option value="P3">P3 & Above (All Events)</option>
+                <option value="P2">P2 & Above (Default - Medium, High, Critical)</option>
+                <option value="P1">P1 & Above (High & Critical Only)</option>
+                <option value="P0">P0 Only (Critical Outages)</option>
+              </select>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={isUpdatingNotif}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-500 text-white font-semibold text-xs shadow-md shadow-brand-500/20 hover:bg-brand-600 transition-colors disabled:opacity-50"
+              >
+                <Save className="w-4 h-4" />
+                {isUpdatingNotif ? 'Saving Preferences...' : 'Save Notification Preferences'}
               </button>
             </div>
           </form>

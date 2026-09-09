@@ -10,6 +10,7 @@ from backend.services.search_service import SearchService, search_service
 from backend.services.health_service import HealthService, health_service
 from backend.services.audit_service import AuditService, audit_service
 from backend.services.feedback_service import FeedbackService, feedback_service
+from backend.services.notification_service import NotificationService, notification_service
 
 __all__ = [
     "AuthService",
@@ -36,4 +37,6 @@ __all__ = [
     "audit_service",
     "FeedbackService",
     "feedback_service",
+    "NotificationService",
+    "notification_service",
 ]

@@ -12,6 +12,7 @@ from backend.api.v1.search import router as search_router
 from backend.api.v1.health import router as health_router
 from backend.api.v1.feedback import router as feedback_router
 from backend.api.v1.organization import router as organization_router
+from backend.api.v1.notifications import router as notifications_router
 
 api_v1_router = APIRouter()
 api_v1_router.include_router(auth_router)
@@ -27,5 +28,6 @@ api_v1_router.include_router(dashboard_router)
 api_v1_router.include_router(search_router)
 api_v1_router.include_router(health_router)
 api_v1_router.include_router(feedback_router)
+api_v1_router.include_router(notifications_router)
 
 __all__ = ["api_v1_router"]

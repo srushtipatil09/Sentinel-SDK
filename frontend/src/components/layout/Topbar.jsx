@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useProject } from '@/context/ProjectContext';
 import { Bell, LogOut, Search, User, ShieldCheck } from 'lucide-react';
+import { NotificationDrawer } from '@/components/notifications/NotificationDrawer';
 
 export const Topbar = ({ onSearchClick }) => {
   const { user, logout } = useAuth();
   const { activeProject } = useProject();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const navigate = useNavigate();
 
   return (
@@ -41,14 +43,22 @@ export const Topbar = ({ onSearchClick }) => {
 
       {/* Actions & User Menu */}
       <div className="flex items-center gap-3 relative">
-        <button
-          onClick={() => navigate('/settings')}
-          className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative"
-          title="Notifications & Alerts"
-        >
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-brand-500 ring-2 ring-white dark:ring-slate-900" />
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+            className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative"
+            title="Notifications & Alerts"
+            aria-label="Open notifications"
+          >
+            <Bell className="w-5 h-5" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-brand-500 ring-2 ring-white dark:ring-slate-900" />
+          </button>
+
+          <NotificationDrawer
+            isOpen={isNotificationOpen}
+            onClose={() => setIsNotificationOpen(false)}
+          />
+        </div>
 
         {/* User Profile Button */}
         <div className="relative">

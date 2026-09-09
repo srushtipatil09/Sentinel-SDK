@@ -284,3 +284,42 @@ export interface OrganizationDetails {
   total_members: number;
   total_projects: number;
 }
+
+export interface NotificationConfig {
+  id: string;
+  project_id: string;
+  channel_type: 'slack' | 'discord' | 'webhook' | 'email' | string;
+  target_url?: string;
+  settings_json: Record<string, any>;
+  is_enabled: boolean;
+  created_at: string;
+}
+
+export interface NotificationHistoryItem {
+  id: string;
+  incident_id?: string;
+  channel_type: string;
+  recipient: string;
+  status: 'SENT' | 'FAILED' | 'RETRYING' | string;
+  sent_at: string;
+  error_message?: string;
+}
+
+export interface CreateNotificationConfigPayload {
+  channel_type: string;
+  target_url?: string;
+  settings_json?: Record<string, any>;
+  is_enabled?: boolean;
+}
+
+export interface UpdateNotificationConfigPayload {
+  channel_type?: string;
+  target_url?: string;
+  settings_json?: Record<string, any>;
+  is_enabled?: boolean;
+}
+
+export interface NotificationTestResult {
+  success: boolean;
+  message: string;
+}

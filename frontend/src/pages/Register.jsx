@@ -66,7 +66,7 @@ export const Register = () => {
               <input
                 type="text"
                 required
-                placeholder="Rimay Patil"
+                placeholder="Srushti Patil"
                 value={fullName}
                 onChange={e => setFullName(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
@@ -83,7 +83,7 @@ export const Register = () => {
               <input
                 type="email"
                 required
-                placeholder="rimay@company.com"
+                placeholder="any@company.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"

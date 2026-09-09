@@ -273,6 +273,21 @@ class IncidentDetector:
         except Exception as fs_exc:
             logger.warning("Firestore incident mirror failed on create", error=str(fs_exc))
 
+        # Dispatch incident alert to configured notification channels (Slack, Discord, Email, Webhooks)
+        try:
+            from backend.notifications.notifier import notification_engine
+            await notification_engine.dispatch_project_incident_alert(
+                session=session,
+                project_id=project_id,
+                incident_title=new_incident.title,
+                severity=severity,
+                service_name=service_name,
+                rca_summary=None,
+                incident_id=new_incident.id
+            )
+        except Exception as notif_exc:
+            logger.warning("Failed to dispatch initial incident notification", error=str(notif_exc))
+
         # Trigger Autonomous LangGraph AI RCA Orchestration Workflow
                 # Trigger Autonomous LangGraph AI RCA Orchestration Workflow.
         # Fired as a background task (not awaited) so the ingest endpoint can
@@ -436,6 +451,22 @@ class IncidentDetector:
                 )
                 session.add(ai_timeline)
                 await session.flush()
+
+                # Dispatch updated incident alert with AI RCA Root Cause Summary
+                try:
+                    from backend.notifications.notifier import notification_engine
+                    await notification_engine.dispatch_project_incident_alert(
+                        session=session,
+                        project_id=incident.project_id,
+                        incident_title=incident.title,
+                        severity=incident.severity,
+                        service_name=service_name,
+                        rca_summary=report_model.root_cause,
+                        incident_id=incident.id
+                    )
+                except Exception as notif_exc:
+                    logger.warning("Failed to dispatch RCA incident notification", error=str(notif_exc))
+
                 logger.info("Successfully completed AI RCA workflow for incident", incident_id=str(incident.id))
         except Exception as exc:
             logger.error("AI RCA Workflow failed for incident", incident_id=str(incident.id), error=str(exc))

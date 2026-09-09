@@ -7,6 +7,7 @@ from backend.repositories.knowledge_repository import KnowledgeRepository
 from backend.repositories.dashboard_repository import DashboardRepository
 from backend.repositories.feedback_repository import FeedbackRepository
 from backend.repositories.audit_repository import AuditRepository
+from backend.repositories.notification_repository import NotificationConfigRepository, NotificationHistoryRepository
 
 __all__ = [
     "BaseRepository",
@@ -27,4 +28,6 @@ __all__ = [
     "DashboardRepository",
     "FeedbackRepository",
     "AuditRepository",
+    "NotificationConfigRepository",
+    "NotificationHistoryRepository",
 ]

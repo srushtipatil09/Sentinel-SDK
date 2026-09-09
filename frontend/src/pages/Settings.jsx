@@ -1,17 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useProject } from '@/context/ProjectContext';
 import { profileApi } from '@/api/profile';
 import { organizationApi } from '@/api/organization';
 import { SdkOnboardingStep } from '@/components/sdk/SdkOnboardingStep';
+import { NotificationSettingsTab } from '@/components/notifications/NotificationSettingsTab';
 import { Modal } from '@/components/common/Modal';
 import { Key, Lock, Bell, Server, Settings as SettingsIcon, User, ShieldCheck, Users, Plus, UserPlus, Trash2, CheckCircle2, AlertCircle, Building } from 'lucide-react';
 import { clsx } from 'clsx';
 
 export const Settings = () => {
+  const location = useLocation();
   const { user, refreshUser } = useAuth();
   const { activeProject, projects } = useProject();
   const [activeTab, setActiveTab] = useState('sdk');
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tabParam = params.get('tab');
+    if (tabParam && ['sdk', 'notifications', 'profile', 'project', 'org'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [location.search]);
 
   // Profile form
   const [fullName, setFullName] = useState(user?.full_name || '');
@@ -141,6 +152,7 @@ export const Settings = () => {
 
   const tabs = [
     { id: 'sdk', label: 'SDK Integration', icon: Server },
+    { id: 'notifications', label: 'Alerts & Webhooks', icon: Bell },
     { id: 'profile', label: 'User Profile', icon: User },
     { id: 'project', label: 'Project Settings', icon: SettingsIcon },
     ...(isOwner ? [{ id: 'org', label: 'Organization & Members', icon: Users }] : []),
@@ -182,6 +194,8 @@ export const Settings = () => {
 
       {/* Tab Content */}
       {activeTab === 'sdk' && <SdkOnboardingStep />}
+
+      {activeTab === 'notifications' && <NotificationSettingsTab />}
 
       {activeTab === 'profile' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
