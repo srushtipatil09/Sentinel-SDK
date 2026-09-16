@@ -156,3 +156,4 @@ Incident analysis is driven by a 9-node directed graph orchestrated via **LangGr
 - **Google Cloud Run:** Dual-container setup (Backend API + Frontend Nginx).
 - **Google Cloud Build:** Automated CI/CD build manifests (`cloudbuild.yaml`).
 - **Docker Compose:** Full local development stack (Postgres + Redis + Backend + Frontend).
+
