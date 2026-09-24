@@ -44,7 +44,7 @@ app.use(client.expressMiddleware());`;
             Install the SDK, add 3 lines of code with your API key, and telemetry starts flowing automatically.
           </h2>
           <p className="text-base text-slate-400">
-            Plug the official Sentinel AI Node.js SDK into your existing services with zero friction.
+            Plug the official Observe AI Node.js SDK into your existing services with zero friction.
           </p>
         </div>
 
@@ -94,7 +94,7 @@ app.use(client.expressMiddleware());`;
                 Configure Ingestion Key
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Generate an API key in your Sentinel AI dashboard and initialize the client.
+                Generate an API key in your Observe AI dashboard and initialize the client.
               </p>
             </div>
 

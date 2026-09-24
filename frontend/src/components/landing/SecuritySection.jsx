@@ -37,7 +37,7 @@ export const SecuritySection = () => {
             Security & Data Protection Built-In
           </h2>
           <p className="text-base text-slate-400">
-            Sentinel AI enforces strict security policies for SDK data ingestion and user session management.
+            Observe AI enforces strict security policies for SDK data ingestion and user session management.
           </p>
         </div>
 

@@ -42,7 +42,7 @@ export const Register = () => {
             <Activity className="w-7 h-7 animate-pulse" />
           </div>
           <h1 className="text-2xl font-bold text-white tracking-tight">
-            Sentinel<span className="text-brand-400">AI</span>
+            Observe<span className="text-brand-400">AI</span>
           </h1>
           <p className="text-xs text-slate-400">
             Deploy autonomous root cause analysis for your tech stack
@@ -66,7 +66,7 @@ export const Register = () => {
               <input
                 type="text"
                 required
-                placeholder="Srushti Patil"
+                placeholder="Rimay Patil"
                 value={fullName}
                 onChange={e => setFullName(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
@@ -99,7 +99,7 @@ export const Register = () => {
               <Building className="w-4 h-4 absolute left-3.5 top-3 text-slate-500" />
               <input
                 type="text"
-                placeholder="Sentinel AI Labs"
+                placeholder="Observe AI Labs"
                 value={orgName}
                 onChange={e => setOrgName(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"

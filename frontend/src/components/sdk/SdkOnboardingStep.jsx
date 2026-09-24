@@ -227,7 +227,7 @@ sdk.capture_log("ERROR", "Database connection pool timeout", attributes={"pool_s
           Connect Your Application via SDK
         </h3>
         <p className="text-sm text-slate-600 dark:text-slate-400">
-          Connect your microservices to Sentinel AI to automatically ingest logs, uncaught exceptions, trace spans, and metric anomalies for AI Root Cause Analysis.
+          Connect your microservices to Observe AI to automatically ingest logs, uncaught exceptions, trace spans, and metric anomalies for AI Root Cause Analysis.
         </p>
 
         {/* Tech Selector */}
@@ -447,7 +447,7 @@ sdk.capture_log("ERROR", "Database connection pool timeout", attributes={"pool_s
         }}
         onConfirm={handleConfirmRevokeApiKey}
         title="Revoke SDK ingestion key?"
-        description="This will immediately stop this key from sending telemetry to Sentinel AI. The key will be permanently deleted and cannot be recovered."
+        description="This will immediately stop this key from sending telemetry to Observe AI. The key will be permanently deleted and cannot be recovered."
         keyPrefix={keyToRevoke ? keyToRevoke.prefix : ''}
         confirmText="Revoke Key"
         cancelText="Cancel"

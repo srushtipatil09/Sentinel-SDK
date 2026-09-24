@@ -1,6 +1,6 @@
-# Sentinel AI Frontend Application
+# Observe AI Frontend Application
 
-Sentinel AI is an AI-powered observability and autonomous Root Cause Analysis (RCA) platform. This frontend application communicates directly with the FastAPI backend (`http://127.0.0.1:8000/api/v1`) through standardized HTTP JSON API envelopes.
+Observe AI is an AI-powered observability and autonomous Root Cause Analysis (RCA) platform. This frontend application communicates directly with the FastAPI backend (`http://127.0.0.1:8000/api/v1`) through standardized HTTP JSON API envelopes.
 
 ---
 
@@ -22,7 +22,7 @@ Sentinel AI is an AI-powered observability and autonomous Root Cause Analysis (R
 ### Prerequisites
 
 - Node.js (v18.0.0 or higher)
-- Sentinel AI FastAPI Backend running on `http://127.0.0.1:8000`
+- Observe AI FastAPI Backend running on `http://127.0.0.1:8000`
 
 ### Installation
 

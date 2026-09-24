@@ -83,7 +83,7 @@ export const ProblemSection = () => {
                     <Zap className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-100">Sentinel AI Autonomous Engine</h3>
+                    <h3 className="text-lg font-bold text-slate-100">Observe AI Autonomous Engine</h3>
                     <p className="text-xs text-cyan-400 font-medium">Multi-agent correlation & automatic root cause</p>
                   </div>
                 </div>

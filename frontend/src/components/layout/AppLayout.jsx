@@ -90,7 +90,7 @@ export const AppLayout = () => {
       <Modal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
-        title="Search Sentinel AI"
+        title="Search Observe AI"
         maxWidth="lg"
       >
         <div className="space-y-4">
