@@ -34,7 +34,7 @@ class NotificationEngine:
         error_msg = None
 
         message_body = (
-            f"🚨 *[{severity}] Sentinel AI Incident Alert*\n"
+            f"🚨 *[{severity}] Observe AI Incident Alert*\n"
             f"*Service:* {service_name}\n"
             f"*Title:* {incident_title}\n"
             f"*Status:* AI Processing Complete\n"
@@ -64,7 +64,7 @@ class NotificationEngine:
                 has_resend = bool(settings.RESEND_API_KEY or (settings.SMTP_PASSWORD and settings.SMTP_PASSWORD.startswith("re_")))
                 has_smtp = bool(settings.SMTP_HOST and settings.SMTP_USER)
                 if has_resend or has_smtp:
-                    success = self._send_email(target_email, f"[{severity}] Sentinel AI Incident: {service_name}", message_body)
+                    success = self._send_email(target_email, f"[{severity}] Observe AI Incident: {service_name}", message_body)
                     if not success:
                         error_msg = f"Failed to send email to {target_email} via Resend/SMTP."
                 else:
@@ -105,7 +105,7 @@ class NotificationEngine:
         error_msg = None
 
         test_message = (
-            "🔔 *[Sentinel AI] Test Notification*\n"
+            "🔔 *[Observe AI] Test Notification*\n"
             f"Your *{channel.upper()}* alert channel has been successfully verified.\n"
             "You will receive automated incident alerts and AI Root Cause Analysis summaries on this channel."
         )
@@ -120,7 +120,7 @@ class NotificationEngine:
                 success = await self._send_generic_webhook(config.target_url, {
                     "event": "TEST_ALERT",
                     "channel": channel,
-                    "message": "Sentinel AI webhook channel verification successful."
+                    "message": "Observe AI webhook channel verification successful."
                 })
             elif channel == "email":
                 target_email = (config.settings_json or {}).get("email") or config.target_url or settings.EMAILS_FROM_EMAIL
@@ -128,7 +128,7 @@ class NotificationEngine:
                 has_resend = bool(settings.RESEND_API_KEY or (settings.SMTP_PASSWORD and settings.SMTP_PASSWORD.startswith("re_")))
                 has_smtp = bool(settings.SMTP_HOST and settings.SMTP_USER)
                 if has_resend or has_smtp:
-                    success = self._send_email(target_email, "Sentinel AI - Channel Test Notification", test_message)
+                    success = self._send_email(target_email, "Observe AI - Channel Test Notification", test_message)
                     if not success:
                         error_msg = f"Failed to deliver email to {target_email}. Check Resend API key or SMTP credentials."
                 else:
@@ -286,10 +286,10 @@ class NotificationEngine:
 
     def send_password_reset_email(self, recipient_email: str, reset_token: str) -> bool:
         """Dispatches password reset link token email."""
-        subject = "Sentinel AI - Password Reset Request"
+        subject = "Observe AI - Password Reset Request"
         body = (
             f"Hello,\n\n"
-            f"You requested a password reset for your Sentinel AI account.\n"
+            f"You requested a password reset for your Observe AI account.\n"
             f"Use the following reset token to set a new password:\n\n"
             f"Token: {reset_token}\n\n"
             f"If you did not request this, please ignore this email.\n"
