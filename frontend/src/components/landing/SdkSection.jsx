@@ -6,10 +6,10 @@ export const SdkSection = () => {
   const [copiedInstall, setCopiedInstall] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
 
-  const installCmd = 'npm install sentinelai-sdk';
+  const installCmd = 'npm install observeai-sdk';
 
-  const nodeSnippet = `const { SentinelAIClient } = require('sentinelai-sdk');
-const client = new SentinelAIClient({ apiKey: 'stl_live_xxx', serviceName: 'checkout-service' });
+  const nodeSnippet = `const { ObserveAIClient } = require('observeai-sdk');
+const client = new ObserveAIClient({ apiKey: 'stl_live_xxx', serviceName: 'checkout-service' });
 app.use(client.expressMiddleware());`;
 
   const handleCopyInstall = () => {
@@ -25,9 +25,9 @@ app.use(client.expressMiddleware());`;
   };
 
   const configOptions = [
-    { name: 'apiKey', required: true, default: 'None', desc: 'Required. Your Sentinel AI project API key generated in the dashboard.' },
+    { name: 'apiKey', required: true, default: 'None', desc: 'Required. Your Observe AI project API key generated in the dashboard.' },
     { name: 'serviceName', required: true, default: 'None', desc: 'Required. Microservice identifier (e.g. "payment-service").' },
-    { name: 'endpointUrl', required: false, default: 'https://sentinelai-backend-w23eki576a-uc.a.run.app/api/v1/sdk/ingest', desc: 'Optional. Backend ingestion URL.' },
+    { name: 'endpointUrl', required: false, default: 'https://observeai-backend-w23eki576a-uc.a.run.app/api/v1/sdk/ingest', desc: 'Optional. Backend ingestion URL.' },
     { name: 'environment', required: false, default: "'production'", desc: 'Optional. Deployment environment ("development" | "staging" | "production").' },
   ];
 

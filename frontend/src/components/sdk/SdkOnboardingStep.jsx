@@ -185,12 +185,12 @@ export const SdkOnboardingStep = () => {
 
   const currentDisplayKey = revealedKey || generatedKey;
 
-  const backendIngestUrl = (import.meta.env.VITE_API_BASE_URL || 'https://sentinelai-backend-w23eki576a-uc.a.run.app/api/v1') + '/sdk/ingest';
+  const backendIngestUrl = (import.meta.env.VITE_API_BASE_URL || 'https://observeai-backend-w23eki576a-uc.a.run.app/api/v1') + '/sdk/ingest';
 
-  const nodeCodeExample = `import { SentinelAIClient } from '@sentinelai/sdk';
+  const nodeCodeExample = `import { ObserveAIClient } from '@observeai/sdk';
 
-const sdk = new SentinelAIClient({
-    apiKey: "${currentDisplayKey || (activeApiKey ? activeApiKey.prefix + '...' : 'YOUR_SENTINELAI_API_KEY')}",
+const sdk = new ObserveAIClient({
+    apiKey: "${currentDisplayKey || (activeApiKey ? activeApiKey.prefix + '...' : 'YOUR_OBSERVEAI_API_KEY')}",
     serviceName: "${activeProject?.name?.toLowerCase().replace(/\s+/g, '-') || 'my-service'}",
     endpointUrl: "${backendIngestUrl}"
 });
@@ -198,11 +198,11 @@ const sdk = new SentinelAIClient({
 // Capture HTTP request telemetry, errors, and traces
 app.use(sdk.expressMiddleware());`;
 
-  const pythonCodeExample = `# Installation: pip install sentinelai-telemetry-sdk
-from sentinelai_sdk import SentinelAISDKClient
+  const pythonCodeExample = `# Installation: pip install observeai-telemetry-sdk
+from observeai_sdk import ObserveAISDKClient
 
-sdk = SentinelAISDKClient(
-    api_key="${currentDisplayKey || (activeApiKey ? activeApiKey.prefix + '...' : 'YOUR_SENTINELAI_API_KEY')}",
+sdk = ObserveAISDKClient(
+    api_key="${currentDisplayKey || (activeApiKey ? activeApiKey.prefix + '...' : 'YOUR_OBSERVEAI_API_KEY')}",
     service_name="${activeProject?.name?.toLowerCase().replace(/\s+/g, '-') || 'my-service'}",
     endpoint_url="${backendIngestUrl}"
 )
